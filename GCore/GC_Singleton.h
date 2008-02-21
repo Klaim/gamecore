@@ -4,7 +4,7 @@
 
 #include "GC_Common.h"
 
-namespace gcore
+namespace GCore
 {
 		
 	/** Singleton : class with an unique occurency.

@@ -8,7 +8,7 @@
 #include "GC_Common.h"
 #include "GC_ParamProcessor.h"
 
-namespace gcore
+namespace GCore
 {
 	/** The key is the name of the processor and the value is a pointer to the processor.
 	*/

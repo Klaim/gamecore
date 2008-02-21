@@ -5,7 +5,7 @@
 
 #include "GC_ConsoleCommand.h"
 
-namespace gcore
+namespace GCore
 {
 	class Task;
 	class TaskManager;

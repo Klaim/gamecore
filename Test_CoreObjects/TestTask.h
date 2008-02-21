@@ -20,7 +20,7 @@ using namespace std;
 
 using namespace std;
 
-class TestTask2 : public gcore::Task
+class TestTask2 : public GCore::Task
 {
 private:
 	int		m_id;
@@ -43,7 +43,7 @@ public:
 	}
 };
 
-class TestTask : public gcore::Task , public gcore::Singleton<TestTask>
+class TestTask : public GCore::Task , public GCore::Singleton<TestTask>
 {
 private:
 	std::vector<TestTask2*>	m_Task2;

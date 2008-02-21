@@ -4,7 +4,7 @@
 #include "GC_Console.h"
 #include "GC_UnicodeAscii.h"
 
-namespace gcore
+namespace GCore
 {
 	
 

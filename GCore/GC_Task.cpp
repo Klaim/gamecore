@@ -1,7 +1,7 @@
 #include "GC_Task.h"
 #include "GC_TaskManager.h"
 
-namespace gcore
+namespace GCore
 {
 		
 	void Task::activate(TaskManager* taskManager)

@@ -1,7 +1,7 @@
 #include "GC_EventManager.h"
 
 
-namespace gcore
+namespace GCore
 {
 
 

@@ -10,7 +10,7 @@
 #include "GC_Task.h"
 
 
-namespace gcore
+namespace GCore
 {
 
 	/** The TaskManager is a tool that let you dynamize your main loop.

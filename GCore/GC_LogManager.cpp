@@ -1,7 +1,7 @@
 #include "GC_LogManager.h"
 #include <algorithm>
 
-namespace gcore
+namespace GCore
 {
 	void LogManager::dispatchMessage(const String& logName, const String& message, LogMessageLevel level)
 	{

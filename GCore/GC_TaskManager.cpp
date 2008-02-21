@@ -1,7 +1,7 @@
 #include "GC_TaskManager.h"
 #include "GC_Exception.h"
 
-namespace gcore
+namespace GCore
 {
 		
 

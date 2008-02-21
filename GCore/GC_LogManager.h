@@ -5,7 +5,7 @@
 #include "GC_String.h"
 #include <map>
 #include <vector>
-#include "GC_Common.h"	//Use gcore System common defines
+#include "GC_Common.h"	//Use GCore System common defines
 #include "GC_Singleton.h"
 
 #include "GC_Log.h"
@@ -14,7 +14,7 @@
 ///Default log file : 
 #define GC_LOG_FILE "lastSession.log"
 
-namespace gcore
+namespace GCore
 {
 	
 	/** Interface class for using logs.			
