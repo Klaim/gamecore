@@ -1,6 +1,6 @@
 #include "GC_EventTask.h"
 
-namespace gcore
+namespace GCore
 {
 
 	EventTask::EventTask( EventManager& eventManager, TaskPriority priority /*= 0 */,const String& name /*= "" */ ) 

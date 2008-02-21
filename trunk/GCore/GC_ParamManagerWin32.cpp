@@ -1,7 +1,7 @@
 #include "GC_ParamManagerWin32.h"
 #if GC_PLATFORM == GC_PLATFORM_WIN32
 
-namespace gcore
+namespace GCore
 {
 
 	/**

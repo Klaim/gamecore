@@ -7,7 +7,7 @@
 #if GC_PLATFORM == GC_PLATFORM_WIN32
 #include "GC_ParamManager.h"
 
-namespace gcore
+namespace GCore
 {
 	/** Default ParamManager for Win32 system.
 

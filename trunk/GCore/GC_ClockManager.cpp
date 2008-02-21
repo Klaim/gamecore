@@ -1,7 +1,7 @@
 #include "GC_ClockManager.h"
 #include "GC_Clock.h"
 
-namespace gcore
+namespace GCore
 {
 
 	/** Constructor.

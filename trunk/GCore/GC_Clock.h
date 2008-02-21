@@ -8,7 +8,7 @@
 #include "GC_Time.h"
 #include "GC_ClockManager.h"
 
-namespace gcore
+namespace GCore
 {
 
 

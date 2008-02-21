@@ -1,7 +1,7 @@
 #include <boost/tokenizer.hpp>
 #include "GC_Console.h"
 
-namespace gcore
+namespace GCore
 {
 
 	
@@ -290,6 +290,10 @@ namespace gcore
 		onEntryChanged();
 	}
 
+	GCore::String Console::toString()
+	{
+		return "TestMan mothafucka!";
+	}
 /*
 	void Console::setMaxEntries(unsigned int val)
 	{

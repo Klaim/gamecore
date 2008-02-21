@@ -4,18 +4,18 @@
 
 #include <string>
 
-namespace gcore
+namespace GCore
 {
 
-	/// Character type used for Unicode strings in gcore.
+	/// Character type used for Unicode strings in GCore.
 	typedef wchar_t UTF_CHAR;
 
 	
-	/// Unicode string used in gcore.
+	/// Unicode string used in GCore.
 	typedef std::basic_string< UTF_CHAR > UTFString;
 
 
-	/// String type used int gcore.
+	/// String type used int GCore.
 	typedef std::string String;
 
 

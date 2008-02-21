@@ -9,7 +9,7 @@
 #include "GC_Common.h"
 #include "GC_TimeReferenceProvider.h"
 
-namespace gcore
+namespace GCore
 {
 	class Clock;
 	

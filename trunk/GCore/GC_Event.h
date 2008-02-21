@@ -6,7 +6,7 @@
 
 #include "GC_Common.h"
 
-namespace gcore
+namespace GCore
 {
 
 	///Event type type .
