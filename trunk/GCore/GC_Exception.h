@@ -4,7 +4,7 @@
 
 #include "GC_String.h"
 
-namespace GCore
+namespace gcore
 {
 	/** 
 	*	GCore exception base class.
@@ -103,12 +103,12 @@ namespace GCore
 
 }
 
-/// Throw a general GCore::Exception. Use it as a critical error.
-#define GC_EXCEPTION( msg ) throw GCore::Exception( msg , 0, __FUNCTION__ , __FILE__ , __LINE__ )
+/// Throw a general gcore::Exception. Use it as a critical error.
+#define GC_EXCEPTION( msg ) throw gcore::Exception( msg , 0, __FUNCTION__ , __FILE__ , __LINE__ )
 
-/// GCore assert macro that throw a GCore::AssertException on failure in debug mode.
+/// GCore assert macro that throw a gcore::AssertException on failure in debug mode.
 #ifdef GC_DEBUG
-#define GC_ASSERT( test , msg ) if(!(test))throw GCore::AssertionException( msg , #test , __FUNCTION__ , __FILE__ , __LINE__ )
+#define GC_ASSERT( test , msg ) if(!(test))throw gcore::AssertionException( msg , #test , __FUNCTION__ , __FILE__ , __LINE__ )
 #else
 	#define GC_ASSERT(test , msg)
 #endif

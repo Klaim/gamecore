@@ -1,6 +1,6 @@
 #include "GC_ClockTask.h"
 
-namespace GCore
+namespace gcore
 {
 	ClockTask::ClockTask( ClockManager& eventManager, TaskPriority priority /*= 0 */,const String& name /*= "" */ ) 
 		:Task( priority , name ),

@@ -13,7 +13,7 @@
 #include <fstream>
 #include "GC_Common.h"
 
-namespace GCore
+namespace gcore
 {
 
 	class LogManager;

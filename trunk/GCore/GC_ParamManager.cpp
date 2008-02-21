@@ -1,7 +1,7 @@
 
 #include "GC_ParamManager.h"
 
-namespace GCore
+namespace gcore
 {
 
 	ParamManager::ParamManager()

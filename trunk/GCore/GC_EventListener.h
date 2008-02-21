@@ -5,7 +5,7 @@
 #include "GC_Common.h"
 #include "GC_Event.h"
 
-namespace GCore
+namespace gcore
 {
 	class EventManager;
 

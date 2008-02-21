@@ -4,7 +4,7 @@
 
 #include "GC_UnicodeAscii.h"
 
-namespace GCore
+namespace gcore
 {
 
 	String GCORE_API ToAscii( const UTFString& ws )

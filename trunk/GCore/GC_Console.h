@@ -11,7 +11,7 @@
 #include "GC_ConsoleCommand.h"
 
 
-namespace GCore	//GCore context
+namespace gcore	//gcore context
 {
 
 	/** Base class for console management system.
@@ -151,7 +151,6 @@ namespace GCore	//GCore context
 		virtual ~Console();
 		//////////////////////////////////////////////////////////////////////////
 
-		String toString();
 
 	protected:
 

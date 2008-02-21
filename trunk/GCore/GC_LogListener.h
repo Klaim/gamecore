@@ -14,7 +14,7 @@
 
 
 
-namespace GCore
+namespace gcore
 {
 	class LogManager;
 

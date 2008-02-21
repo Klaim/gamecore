@@ -1,6 +1,6 @@
 #include "GC_Clock.h"
 
-namespace GCore
+namespace gcore
 {
 
 

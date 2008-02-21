@@ -7,7 +7,7 @@
 #include "GC_ClockManager.h"
 #include "GC_Task.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Task that update an ClockManager by calling it's ClockManager::updateClocks() function each cycle.
