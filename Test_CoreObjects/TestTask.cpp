@@ -37,7 +37,7 @@ void TestTask::onTerminate()
 
 	for( std::vector<TestTask2*>::iterator it = m_Task2.begin(); it != m_Task2.end(); ++it)
 	{
-		if((*it)->getState() == GCore::TS_ACTIVE)
+		if((*it)->getState() == gcore::TS_ACTIVE)
 		{
 			(*it)->terminate();
 		}
@@ -100,7 +100,7 @@ void TestTask::execute()
 		for (; i < SIZE_TASKS && this->m_Task2[i]->getName() != cmd[1]; ++i)
 			;
 		if (i != SIZE_TASKS){
-		if (cmd[0] == "resumed" && this->m_Task2[i]->getState() == GCore::TS_PAUSED)
+		if (cmd[0] == "resumed" && this->m_Task2[i]->getState() == gcore::TS_PAUSED)
 			this->m_Task2[i]->resume();
 		else if (cmd[0] == "terminate")
 			this->m_Task2[i]->terminate();
@@ -156,7 +156,7 @@ void TestTask2::execute()
 
 	if (cmd[1] != "" && cmd[1] == this->getName())
 	{
-		if (cmd[0] == "pause" && this->getState() == GCore::TS_ACTIVE)
+		if (cmd[0] == "pause" && this->getState() == gcore::TS_ACTIVE)
 			pause();
 		else
 			std::cout << "Execute task " + this->getName() << std::endl;

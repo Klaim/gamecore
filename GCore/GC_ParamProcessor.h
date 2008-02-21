@@ -4,7 +4,7 @@
 
 #include "GC_String.h"
 #include "GC_Common.h"
-namespace GCore
+namespace gcore
 {
 
 	/*

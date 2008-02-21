@@ -7,7 +7,7 @@
 #include "GC_EventManager.h"
 #include "GC_Task.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Task that update an EventManager by calling it's EventManager::processEvents() function each cycle.

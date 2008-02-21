@@ -1,6 +1,6 @@
 #include "GC_Application.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Constructor.
@@ -96,7 +96,6 @@ namespace GCore
 		if(m_state==APPSTATE_RUNNING)
 		{
 			m_state=APPSTATE_TERMINATING;
-
 		}
 	}
 

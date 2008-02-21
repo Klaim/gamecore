@@ -4,7 +4,7 @@
 
 #include "GC_Common.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Serializer interface used by Serializable objects.

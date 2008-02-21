@@ -9,7 +9,7 @@
 
 #include "GC_Common.h"
 
-namespace GCore
+namespace gcore
 {
 
 	class Console;

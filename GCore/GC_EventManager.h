@@ -12,7 +12,7 @@
 #include "GC_EventListener.h"
 
 
-namespace GCore	
+namespace gcore	
 {
 
 	/** Manage Events and EventListeners.
@@ -124,7 +124,7 @@ namespace GCore
 
 	
 
-} // GCore
+} // gcore
 
 
 #endif

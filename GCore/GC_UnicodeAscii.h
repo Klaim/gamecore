@@ -6,7 +6,7 @@
 #include "GC_Common.h"
 #include "GC_String.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Convert an Unicode string to an Ascii string.

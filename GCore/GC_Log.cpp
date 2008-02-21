@@ -4,7 +4,7 @@
 #include "GC_Log.h"
 #include "GC_LogManager.h"
 
-namespace GCore
+namespace gcore
 {
 	//add a new message to the log
 	void Log::logMessage(const String& message, LogMessageLevel level)

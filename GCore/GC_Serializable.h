@@ -6,7 +6,7 @@
 
 #include "GC_Serializer.h"
 
-namespace GCore
+namespace gcore
 {
 
 	/** Serializable interface for objects that should be serializable.

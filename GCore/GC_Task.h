@@ -6,13 +6,13 @@
 
 #include "GC_Common.h"
 
-namespace GCore
+namespace gcore
 {
 
 	class TaskManager;
 
 	///Task priority type.
-	typedef String TaskPriority;
+	typedef std::string TaskPriority;
 
 	///Task state.
 	enum TASK_STATE

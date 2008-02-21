@@ -148,10 +148,6 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-			<File
-				RelativePath=".\GC_Profiler.cpp"
-				>
-			</File>
 			<Filter
 				Name="Task"
 				>
@@ -407,10 +403,10 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Profiler"
+				Name="Interpolator"
 				>
 				<File
-					RelativePath=".\GC_Profiler.h"
+					RelativePath=".\GC_Interpolator.h"
 					>
 				</File>
 			</Filter>

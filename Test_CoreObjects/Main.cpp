@@ -14,7 +14,7 @@
 bool ThreadRunning;
 std::string lastEntry;
 
-class MyConsole : public GCore::Console
+class MyConsole : public gcore::Console
 {
 public:
 	/** Draw the text.
@@ -28,11 +28,11 @@ public:
 
 };
 
-class MyCommand : public GCore::ConsoleCommand
+class MyCommand : public gcore::ConsoleCommand
 {
 	
 public:
-	void execute( GCore::Console & console , const std::vector< std::wstring >& parametterList)
+	void execute( gcore::Console & console , const std::vector< std::wstring >& parametterList)
 	{
 		std::wcout<< "MyCommand!" <<std::endl;
 	}
@@ -42,11 +42,11 @@ public:
 void testThread()
 {
 	//TODO : finir cette fonction thread qui test les events selon la valeur de lastEntry
-	using namespace GCore;
+	using namespace gcore;
 
 	MyConsole console;
 
-	console.addCommand( L"test", GCore::ConsoleCommandPtr( new MyCommand() ) );
+	console.addCommand( L"test", gcore::ConsoleCommandPtr( new MyCommand() ) );
 
 	console.setEntry(L"/test");
 
@@ -65,7 +65,7 @@ void testThread()
 
 int main()
 {
-	using namespace GCore;
+	using namespace gcore;
 
 	LogManager::create();
 
@@ -94,7 +94,7 @@ int main()
 			taskManager->executeTasks();
 		}
 	}
-	catch(GCore::Exception& ex)
+	catch(gcore::Exception& ex)
 	{
 		GC_LOGMSG( ex.getMessage() );
 	}

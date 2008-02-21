@@ -1,7 +1,7 @@
 #include <boost/tokenizer.hpp>
 #include "GC_Console.h"
 
-namespace GCore
+namespace gcore
 {
 
 	
@@ -201,6 +201,7 @@ namespace GCore
 			{
 				//no default command : we just print the entry
 				printText(m_Entry);
+				printText("KikooLol");
 			}
 		}
 
@@ -290,10 +291,6 @@ namespace GCore
 		onEntryChanged();
 	}
 
-	GCore::String Console::toString()
-	{
-		return "TestMan mothafucka!";
-	}
 /*
 	void Console::setMaxEntries(unsigned int val)
 	{

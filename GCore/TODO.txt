@@ -7,7 +7,7 @@ This TODO file is obsolete and replaced by the TRAC!!
 
 TODO :
 
-
++ Log > unicode
 + Console
 	- cursor management? 
 	> unicode
@@ -23,7 +23,7 @@ TODO :
 + Task  
 	- Review update loop : maybe add an order list to keep the task update loop consistant.
 	- Timed tasks (using Clocks?).
-+ Machin
+
 / Clock
 / Application 
 + Interpolator ?
