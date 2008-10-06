@@ -9,7 +9,7 @@
 
 //nullptr definition:
 #ifndef nullptr
-	#define nullptr (0)
+	#define nullptr NULL
 #endif
 
 //////////////////////////////////////////////////////////////////////////
@@ -27,18 +27,13 @@
 	#define GC_DEBUG
 #endif
 
-#ifndef GC_LIB_BUILD // DLL mode 
-	#if defined ( GCORE_SOURCE ) 
-	///Import / Export of dynamic lib functions/classes for Windows
-		#define GCORE_API DllExport
-	#else
-	///Import / Export of dynamic lib functions/classes for Windows
-		#define GCORE_API DllImport
-	#endif
+#if defined ( GCORE_SOURCE )
+///Import / Export of dynamic lib functions/classes for Windows
+	#define GCORE_API DllExport
 #else
-	#define GCORE_API  // lib mode : don't export symbols
+///Import / Export of dynamic lib functions/classes for Windows
+	#define GCORE_API DllImport
 #endif
-
 
 //Exception management
 #include "GC_Exception.h" 

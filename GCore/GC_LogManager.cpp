@@ -3,55 +3,73 @@
 
 namespace gcore
 {
-	void LogManager::dispatchMessage(const String& logName, const String& message, LogMessageLevel level)
-	{
-		//Send the message to all registered LogCatchers
-		for(	std::vector< LogListener*  >::iterator iter = this->m_LogCatcherPool.begin();
-			iter != this->m_LogCatcherPool.end();
-			iter++)
-		{
-			(*iter)->catchLogMessage(logName, message, level);
-		}
-	}
+	
+	const String LogManager::DEFAULT_LOG( "lastSession.log" );
 
-	//Register a LogListener 
-	void LogManager::addLogListener(LogListener* logListener)
+	void LogManager::addLogListener( LogListener* logListener, const String& logName )
 	{
-		if(!logListener)
+		GC_ASSERT( logListener != nullptr, String( "Tried to add a null listener to log " ) + logName );
+
+		if( logName != "" )
 		{
-			//!!! tried to add a nullptr LogListener!
-			GC_EXCEPTION("Tried to add a nullptr LogListener!");
+			LogMap::iterator logIt = m_logList.find( logName );
+			if( logIt != m_logList.end() )
+			{
+				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
+				logIt->second->registerListener( logListener );
+			}
+#ifdef GC_DEBUG
+			else
+			{
+				GC_EXCEPTION( String( "Tried to add a listener in a log not found in this log manager! Log searched : " ) + logName );
+			}
+#endif
 		}
-		if(logListener->isRegistered())
+		else
 		{
-			//!!! tried to add an already registered LogListener!
-			GC_EXCEPTION("Tried to add an already registered LogListener!");
+			// register in all the logs
+			LogMap::iterator logIt = m_logList.begin();
+			for( ; logIt != m_logList.end(); ++logIt )
+			{
+				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
+				logIt->second->registerListener( logListener ); 
+			}
 		}
 
-		logListener->m_Registered=true;
-		m_LogCatcherPool.push_back(logListener);
+		
 
 	}
 
 	//Remove a registered LogListener
-	void LogManager::removeLogListener(LogListener* logListener)
+	void LogManager::removeLogListener( LogListener* logListener, const String& logName )
 	{
-		if(!logListener)
+		GC_ASSERT( logListener != nullptr, String( "Tried to remove a null log listener from log " ) + logName );
+
+		if( logName != "" )
 		{
-			//!!! tried to remove a nullptr LogListener!
-			GC_EXCEPTION("Tried to remove a nullptr LogListener!");
+			LogMap::iterator logIt = m_logList.find( logName );
+			if( logIt != m_logList.end() )
+			{
+				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
+				logIt->second->unregisterListener( logListener );
+			}
+#ifdef GC_DEBUG
+			else
+			{
+				GC_EXCEPTION( String( "Tried to unregister a listener from a log not found in this log manager! Log searched : " ) + logName );
+			}
+#endif
 		}
-
-		if(!logListener->isRegistered())
+		else
 		{
-			//!!! tried to remove an unregistered LogListener!
-			GC_EXCEPTION("Tried to remove an unregistered LogListener!");
+			// unregister from all logs
+			LogMap::iterator logIt = m_logList.begin();
+			for( ; logIt != m_logList.end(); ++logIt )
+			{
+				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
+				logIt->second->unregisterListener( logListener ); 
+			}
 		}
-
-
-		std::vector< LogListener*  >::iterator it = std::find(m_LogCatcherPool.begin(),m_LogCatcherPool.end(),logListener);
-		m_LogCatcherPool.erase(it);
-
 
 	}
 
@@ -59,88 +77,100 @@ namespace gcore
 	Log* LogManager::createLog(const String& name,LoggingLevel level,bool isNewFile)
 	{
 
-		if(m_LogList.find(name)!=m_LogList.end())
+		if(m_logList.find(name)!=m_logList.end())
 		{
 			//tried to create a log already created!!!
 			GC_EXCEPTION("Tried to create a log already created!!!");
-
 		}
 
-		Log* log = new Log(this,name, level, isNewFile);
-
-		m_LogList[name]=log;
+		Log* log = new Log( *this, name, level, isNewFile );
+		m_logList[name]=log;
 
 		return log;
 
 	}
 
+
+	void LogManager::destroyLog( const String& name )
+	{
+		LogMap::iterator it = m_logList.find( name );
+		GC_ASSERT( it != m_logList.end(), String( "Tried to destroy a log not created in the log manager! Log name : ") + name );
+		delete it->second;
+		m_logList.erase( it );
+	}
+
+
 	//Retrieves a Log by name if exists, return nullptr if it don't exits
 	Log* LogManager::getLog(const String& logName)
 	{
-		std::map<String, Log* >::iterator log = m_LogList.find(logName);
-		if(log != m_LogList.end())
+		LogMap::iterator logIt = m_logList.find(logName);
+		if(logIt != m_logList.end())
 		{
-			return log->second;
+			return logIt->second;
 		}
 
 		return nullptr;
 	}
 
 	//Write a message to the Log
-	void LogManager::logMessage(const String& logName, const String& message, LogMessageLevel level)
+	void LogManager::logMessage( const String& logName, const String& message, LogMessageLevel level )
 	{
-		//Find the log to let it handle the message
-		std::map<String, Log* >::iterator log = m_LogList.find(logName);
-		if(log != m_LogList.end())
+		//Find the logIt to let it handle the message
+		LogMap::iterator logIt = m_logList.find( logName );
+		if( logIt != m_logList.end() )
 		{
-			log->second->logMessage(message, level);
+			GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
+			logIt->second->logMessage( message, level );
 		}
+#ifdef GC_DEBUG
+		else
+		{
+			GC_EXCEPTION( String( "Logged a message in a log not found in this log manager! Log searched : " ) + logName );
+		}
+#endif
 	}
 
-	void LogManager::logMessage(const String& message, LogMessageLevel level)
+	void LogManager::logMessage( const String& message, LogMessageLevel level )
 	{
-		m_DefaultLog->logMessage(message,level);
+		m_defaultLog->logMessage( message, level );
 	}
 
-
-	/** Returns a pointer to the default log.
-	*/
-	Log* LogManager::getDefaultLog()
-	{
-		return m_DefaultLog;
-	}
 
 	/** Sets the passed in log as the default log.
 	@returns The previous default log.
 	*/
-	Log* LogManager::setDefaultLog(Log* log)
+	Log* LogManager::setDefaultLog( Log* log )
 	{
-		Log* oldlog=m_DefaultLog;
-		m_DefaultLog=log;
+		GC_ASSERT( log != nullptr, "Tried to set a null default log!" );
+		GC_ASSERT( m_logList.find( log->getName() ) != m_logList.end(), "Tried to set a default log not registered in the log manager!" );
+
+		Log* oldlog=m_defaultLog;
+		m_defaultLog=log;
+
 		return oldlog;
 	}
 
 	LogManager::LogManager(const String& defaultLogName)
 	{
-		//We create a system log that is set as the default log : 
-#ifdef _DEBUG
-		m_DefaultLog = createLog(defaultLogName,LL_BOREME,true);
+		//We create a system logIt that is set as the default logIt : 
+#ifdef GC_DEBUG
+		m_defaultLog = createLog(defaultLogName,LL_BOREME,true);
 #else
-		m_DefaultLog = createLog(defaultLogName,LL_NORMAL,true);
+		m_defaultLog = createLog(defaultLogName,LL_NORMAL,true);
 #endif
-		m_DefaultLog->logMessage("LogManager initialized.");
+		m_defaultLog->logMessage("LogManager initialized.");
 
 	}
 
 	LogManager::~LogManager()
 	{
-		m_DefaultLog->logMessage("Terminate LogManager.");
+		m_defaultLog->logMessage("Terminate LogManager.");
 		// Destroy all logs
-		std::map<String, Log* >::iterator i;
-		for (i = m_LogList.begin(); i != m_LogList.end(); ++i)
+		LogMap::iterator it;
+		for (it = m_logList.begin(); it != m_logList.end(); ++it)
 		{
-			delete i->second;
+			GC_ASSERT( it->second != nullptr, "Found a null log in log manager!" );
+			delete it->second;
 		}
 	}
-
 }

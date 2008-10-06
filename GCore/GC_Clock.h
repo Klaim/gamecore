@@ -28,43 +28,34 @@ namespace gcore
 
 		/** @return Virtual milliseconds passed since the clock initialization.
 		 */
-		TimeValue getTime() const{return TimeValue(float(m_time) * 0.0001);}
-
-		/** @return Virtual microseconds passed since the clock initialization.
-		 */
-		const TimeValue& getPreciseTime() const{return m_time;}
+		const TimeValue& getTime() const{ return m_time; }
 
 		/** @return Time flow factor.
 		 */
-		const TimeFactor& getTimeFlowFactor() const {return m_timeFlowFactor;}
+		const TimeFlowFactor& getTimeFlowFactor() const {return m_timeFlowFactor;}
 
 		/** Virtual delta time (from the last update and flow factor dependent).
 		*/
-		const TimeValue& getDeltaTime() const {return m_deltaTime;}
+		const TimeValue& getDeltaTime() const { return m_deltaTime;}
 
 		/** Time flow factor.
 			@param	factor New flow factor value.
 		 */
-		void setTimeFlowFactor(TimeFactor factor){m_timeFlowFactor=factor;}
+		void setTimeFlowFactor(TimeFlowFactor factor){m_timeFlowFactor=factor;}
 
 		
-		/** Reset Time to 0 microseconds elapsed.
+		/** Reset Time to 0 milliseconds elapsed.
 		 */
 		void reset(){m_time=0; }
 
 		/** Virtual milliseconds passed since the clock initialization.
 			@param time New value.
 		*/
-		void setTime(TimeValue time){m_time=(time*1000);}
-
-		/** Virtual microseconds passed since the clock initialization.
-			@param time New value.
-		*/
-		void setPreciseTime(TimeValue time){m_time=time;}
+		void setTime(TimeValue time){m_time=time;}
 
 		/** @return Clock's name.
 		*/
-		const String& getName(){return m_name;}
+		const String& getName() const {return m_name;}
 		
 	private:
 
@@ -72,13 +63,13 @@ namespace gcore
 		*/
 		String m_name;
 
-		/** Virtual microseconds passed since the clock initialization.
+		/** Virtual milliseconds passed since the clock initialization.
 		 */
 		TimeValue m_time;
 
 		/** Time flow factor.
 		 */
-		TimeFactor m_timeFlowFactor;
+		TimeFlowFactor m_timeFlowFactor;
 
 		/** Virtual delta time (from the last update and flow factor dependant).
 		*/
@@ -88,7 +79,7 @@ namespace gcore
 		friend class ClockManager;
 
 		/** Clock Update (by ClockManager)
-			@param	deltaTime Delta time value (time passed since last udpate, in microseconds).
+			@param	deltaTime Delta time value (time passed since last udpate, in milliseconds).
 		 */
 		void update(TimeValue deltaTime);
 
@@ -97,7 +88,7 @@ namespace gcore
 		*/
 		Clock(const String& name);
 		
-		/** Desstructor.
+		/** Destructor.
 		*/
 		~Clock();
 	

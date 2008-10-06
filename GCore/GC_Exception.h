@@ -2,6 +2,8 @@
 #define GCORE_EXCEPTION_H
 #pragma once
 
+#include <boost/static_assert.hpp>
+
 #include "GC_String.h"
 
 namespace gcore
@@ -106,11 +108,17 @@ namespace gcore
 /// Throw a general gcore::Exception. Use it as a critical error.
 #define GC_EXCEPTION( msg ) throw gcore::Exception( msg , 0, __FUNCTION__ , __FILE__ , __LINE__ )
 
+/// Useful to remind implementer to add missing code once used.
+#define GC_NOT_IMPLEMENTED_YET throw gcore::Exception( "Not implemented yet : DO IT NOW!!!" , 0, __FUNCTION__ , __FILE__ , __LINE__ )
+/// Useful in template code that should not be instantiated, forcing user to define or use specific implementations.
+#define GC_FORCE_IMPLEMENTATION BOOST_STATIC_ASSERT( false );
+
 /// GCore assert macro that throw a gcore::AssertException on failure in debug mode.
 #ifdef GC_DEBUG
-#define GC_ASSERT( test , msg ) if(!(test))throw gcore::AssertionException( msg , #test , __FUNCTION__ , __FILE__ , __LINE__ )
+	#define GC_ASSERT( test , msg ) if(!(test))throw gcore::AssertionException( msg , #test , __FUNCTION__ , __FILE__ , __LINE__ )
 #else
 	#define GC_ASSERT(test , msg)
 #endif
+
 
 #endif

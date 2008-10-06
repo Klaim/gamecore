@@ -40,8 +40,10 @@ namespace gcore	//gcore context
 	class GCORE_API Console
 	{
 
-		public:
+	public:
 
+		// default prefix (L"/"), registered on console construction.
+		static const UTFString DEFAULT_PREFIX;
 		
 		//////////////////////////////////////////////////////////////////////////
 		//Input :

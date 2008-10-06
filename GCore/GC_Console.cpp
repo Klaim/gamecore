@@ -5,6 +5,7 @@ namespace gcore
 {
 
 	
+	const UTFString Console::DEFAULT_PREFIX( L"/" );
 
 	Console::Console(unsigned long maxEntries , unsigned long maxEntryLength  , unsigned long maxTexts )
 		: m_Entry(  )
@@ -15,7 +16,7 @@ namespace gcore
 		, m_LastTexts( maxTexts )
 	{
 		m_DefaultCommand.reset();
-		addCommandPrefix(L"/");
+		addCommandPrefix( DEFAULT_PREFIX );
 
 		//optimizeMemory();
 		m_CommandPrefixList.reserve( 8 ); // this is arbitrary
@@ -201,7 +202,6 @@ namespace gcore
 			{
 				//no default command : we just print the entry
 				printText(m_Entry);
-				printText("KikooLol");
 			}
 		}
 

@@ -4,7 +4,10 @@
 
 #include "GC_String.h"
 #include <vector>
-#include <boost/shared_ptr.hpp>
+#include <functional>
+#include <memory>
+//#include <boost/function.hpp>
+//#include <boost/shared_ptr.hpp>
 
 
 #include "GC_Common.h"
@@ -56,8 +59,36 @@ namespace gcore
 
 	};
 
-	///Smart pointer for ConsoleCommand
-	typedef boost::shared_ptr< ConsoleCommand > ConsoleCommandPtr;
+	/// Smart pointer for ConsoleCommand.
+	//typedef boost::shared_ptr< ConsoleCommand > ConsoleCommandPtr;
+	typedef std::tr1::shared_ptr< ConsoleCommand > ConsoleCommandPtr;
+
+	/// Type of function-like object that can be used as a console command.
+	typedef std::tr1::function< void ( Console& , const std::vector< UTFString >& parameterList )> ConsoleCommandFunction;
+	//typedef boost::function< void ( Console& , const std::vector< UTFString >& ) > ConsoleCommandFunction;
+
+	/** Console command that simply call a provided function.
+		@ see ConsoleCommandFunction
+	*/
+	class ProxyCommand : public ConsoleCommand
+	{
+	public:
+
+		ProxyCommand( const ConsoleCommandFunction& commandFunction, const UTFString& paramSeparators = L" "  )
+			: ConsoleCommand( paramSeparators )
+			, m_commandFunction( commandFunction )
+		{}
+
+		inline void execute( Console & console , const std::vector< UTFString >& parameterList)
+		{
+			m_commandFunction( console, parameterList );
+		}
+
+	private:
+
+		ConsoleCommandFunction m_commandFunction;
+
+	};
 
 }
 

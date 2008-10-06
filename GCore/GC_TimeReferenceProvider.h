@@ -10,7 +10,7 @@ namespace gcore
 
 
 
-	/** Platform-dependant system or application(or other reference)  start time provider base class.
+	/** Platform-dependent system or application(or other reference)  start time provider base class.
 		This is used to provide a time reference to ClockManager objects.
 		@see ClockManager
 	*/
@@ -18,7 +18,7 @@ namespace gcore
 	{
 	public:
 		/** Time passed since the system started (or other base time reference, implementation-specific).
-			@return Time value (in microseconds).
+			@return Time value (in milliseconds).
 		*/
 		virtual TimeValue getTimeSinceStart() const = 0;
 

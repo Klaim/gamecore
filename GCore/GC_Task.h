@@ -2,67 +2,80 @@
 #define GCORE_TASK_H
 #pragma once
 
-#include "GC_String.h"
 
 #include "GC_Common.h"
+#include "GC_String.h"
+
+#include "GC_TaskProperties.h"
+#include "GC_TaskManager.h"
 
 namespace gcore
 {
-
-	class TaskManager;
-
-	///Task priority type.
-	typedef std::string TaskPriority;
-
-	///Task state.
-	enum TASK_STATE
-	{
-		///The Task is unactive and unregistered.
-		TS_UNACTIVE = 0,
-
-		///The Task is registered and active.
-		///It's execute() method will be called each main loop cycle.
-		TS_ACTIVE,
-
-		///The Task is registered and paused.
-		///It's execute() method will not be called until it is resumed.
-		TS_PAUSED,
-		
-	};
-
-	/** A Task is a process that should be executed by
-		a TaskManager each cycle of the application main loop.
-		
+	
+	/** A Task is an iterative process that should be executed by
+		a TaskManager each cycle of a loop. The purpose is
+		to dynamize the execution of the loop by allowing 
+		changing the iterative processes in the loop through 
+		runtime.
+		@par
 		The Task must be registered in a TaskManager, using
-		 TaskManager::activateTask()  in order to be
-		 executed each cycle.
-		\par
-		The Task::execute() method of each active Task will be called
-		each time TaskManager::executeTasks() is called, that should be
-		each application main loop. Those Tasks are executed in priority
-		order : the greatest the last.
-		\remark
+		 TaskManager::registerTask  in order to be
+		 usable.
+		@par
+		The Task::onExecute() method of each active Task will be called
+		each time TaskManager::executeTasks is called, that should be 
+		each loop cycle. Those Tasks are executed in ascending priority
+		order.
+		@remark
 		A Task can be managed only by one unique TaskManager at the same time.
 
 		@see TaskManager
 	*/
 	class GCORE_API Task 
 	{
-
 	public:
 
-		///Name of the Task.
-		const String& getName() const { return m_name; }
+		/** Constructor.
+			@param name Name of the Task.
+			@param priority Priority of the Task.
+		*/
+		Task( TaskPriority priority = 0 ,const String& name = "" )
+			: m_name( name ), 
+			  m_priority( priority ), 
+			  m_state( TS_UNREGISTERED ),
+			  m_taskManager( nullptr )
+		  { }
+
+		  /** Destructor.
+		  */
+		  virtual ~Task()
+		  {
+			  // this protection is to make sure we never have pointer to destroyed task
+			  // in a task manager.
+			  // This test is not ideal but should warn the user about ninja task manipulations
+			  // occurence. 
+			  if ( m_taskManager != nullptr || m_state != TS_UNREGISTERED )
+			  {
+				  GC_EXCEPTION( String("Task destroyed while registered in a TaskManager! Task name :") + m_name );
+			  }
+		  }
+
+		/// Name of the Task (if set on construction).
+		inline const String& getName() const { return m_name; }
 	
 		/** Activate the Task.
-			The Task must be not registered by a TaskManager.
+			The Task must be registered by a TaskManager.
 			Once activated, Task::onActivate() method will be called.
 			@remark This is a proxy function for TaskManager::activateTask().
 			@see TaskManager::activateTask
 			@see onActivate
-			@param taskManager TaskManager that will manager this Task.
 		*/
-		void activate(TaskManager* taskManager);
+		inline void activate()
+		{ 
+			GC_ASSERT( m_taskManager != nullptr , "Tried to activate an unregistered Task : null TaskManager !" );  
+			GC_ASSERT( m_state != TS_UNREGISTERED , "Inconsistent state !" );  
+			m_taskManager->activateTask( this ); 
+		}
 
 		/** Pause the Task.
 			The Task must be registered in a TaskManager and active.
@@ -71,7 +84,12 @@ namespace gcore
 			@see TaskManager::pauseTask
 			@see onActivated
 		*/
-		void pause();
+		inline void pause()
+		{ 
+			GC_ASSERT( m_taskManager != nullptr , "Tried to pause an unregistered Task! : null TaskManager !" );  
+			GC_ASSERT( m_state != TS_UNREGISTERED , "Inconsistent state !" );  
+			m_taskManager->pauseTask( this ); 
+		}
 
 		/** Resume the Task.
 			The Task must be registered in a TaskManager and paused.
@@ -80,7 +98,12 @@ namespace gcore
 			@see TaskManager::resumeTask
 			@see onResumed
 		*/
-		void resume();
+		inline void resume()
+		{ 
+			GC_ASSERT( m_taskManager != nullptr , "Tried to pause an resume Task! : null TaskManager !" );  
+			GC_ASSERT( m_state != TS_UNREGISTERED , "Inconsistent state !" );  
+			m_taskManager->resumeTask( this ); 
+		}
 
 		/** Terminate the Task.
 			The Task must be registered in a TaskManager.
@@ -89,7 +112,24 @@ namespace gcore
 			@see TaskManager::terminateTask
 			@see onTerminate
 		*/
-		void terminate();
+		inline void terminate()
+		{ 
+			GC_ASSERT( m_taskManager != nullptr , "Tried to terminate an unregistered Task! : null TaskManager !" );  
+			GC_ASSERT( m_state != TS_UNREGISTERED , "Inconsistent state !" );  
+			m_taskManager->terminateTask( this );
+		}
+
+		/** Unregister the Task from the TaskManager in wich it's registered.
+			@remark This is a proxy function for TaskManager::unregisterTask().
+			@see TaskManager::unregisterTask
+		*/
+		inline void unregister()
+		{
+			GC_ASSERT( m_taskManager != nullptr , "Tried to unregister an unregistered Task! : null TaskManager !" );  
+			GC_ASSERT( m_state != TS_UNREGISTERED , "Inconsistent state !" );  
+			m_taskManager->unregisterTask( this );
+
+		}
 
 		//////////////////////////
 
@@ -99,47 +139,28 @@ namespace gcore
 			tasks list according to it's new priority.
 			@param priority New priority value for this Task.
 		*/
-		void setPriority(const TaskPriority& priority);
+		inline void setPriority(const TaskPriority& priority)
+		{ 
+			if( m_taskManager != nullptr ) m_taskManager->changeTaskPriority( this, priority );
+			else m_priority = priority;
+		}
 
-		///Priority : the greatest the first to be executed each cycle.
-		const TaskPriority& getPriority() const{return m_priority;}
-
-		///Current state of the Task.
-		const TASK_STATE& getState() const {return m_state;}
-
-		/** Constructor.
-			@param name Name of the Task.
-			@param priority Priority of the Task.
+		/** Priority : ascending order of execution for each cycle.
+			@see 
 		*/
-		Task( TaskPriority priority = 0 ,const String& name = "" ):
-		  m_name(name), 
-		  m_priority(priority), 
-		  m_state(TS_UNACTIVE),
-		  m_taskManager(nullptr)
-		{ }
+		inline const TaskPriority& getPriority() const { return m_priority; }
 
-		/** Destructor.
+		/// Current state of the Task.
+		inline const TaskState& getState() const { return m_state; }
+
+		
+		/** The Task manager currently managing this task or null if this task is not registered.
 		*/
-		virtual ~Task(){   }
+		inline TaskManager* getTaskManager() const { return m_taskManager; };
 	
 
 
 	protected:
-
-		///Managed by a TaskManager.
-		friend class TaskManager;
-
-
-		///Current manager of the Task.
-		TaskManager* m_taskManager;
-
-		/** Define the name of the Task.
-			@remark The Task should be named only one time : 
-			if the Task is already named, that it's name
-			is not "", calling this method will do nothing.
-			@param name New name of the Task.
-		*/
-		void setName(const String& name){ if(m_name!="")m_name = name; }
 
 		/** User defined activation.
 			This method will be called once the Task is registered from a TaskManager and activated.
@@ -167,63 +188,44 @@ namespace gcore
 		*/
 		virtual void onTerminate() = 0;
 
+		/** Normal execution : call the execution code provided by the user.
+			This method will be called each frame.
+			@see TaskManager::executeTasks
+			@remark This way we allow the redefinition of the way the user
+			execution code will be called in a Task type that inherit this one.
+		*/
+		virtual void onExecute(){ this->execute(); }
+
 		/** User defined execution.
 			While the Task is active, this method will be called each time
-			TaskManager::executeTasks(), that should be each application main
+			TaskManager::executeTasks() through Task::onExecute() method, that should be each application main
 			loop cycle. The process of the Task should then be defined in this method.
 		*/
 		virtual void execute() = 0;
 
+		
 	private:
 
 		///Task name.
-		String m_name;
+		const String m_name;
 
 		///Priority : the greatest the first to be executed each cycle.
 		TaskPriority m_priority;
 
 		///Current state of the Task.
-		TASK_STATE m_state;
+		TaskState m_state;
+
+		/// Managed by a TaskManager.
+		friend class TaskManager;
+
+		/// Current manager of the Task or null if not registered.
+		TaskManager* m_taskManager;
 
 	};
 
-	/** Simple template task class that just call the "void update();" function of the
-		provided class.
-		This is useful to simply define a Task class that only update a system by calling
-		it's update function.
-	*/
-	template < class UpdatableClass >
-	class UpdateTask : 
-		public Task
-	{
-	public:
 
-		/** Constructor.
-			@param updatable Object to be updated by this Task. This object class must have a public "void update()" function.
-		*/
-		UpdateTask( UpdatableClass& updatable ,TaskPriority priority = 0 ,const String& name = ""  ):
-		  Task( priority , name ),
-		  m_updatable( updatable )
-		{ }
 
-		virtual ~UpdateTask(){ }
-
-	protected:
-		
-		virtual void onActivate(){ }
-
-		virtual void onTerminate(){ }
-
-		virtual void execute()
-		{
-			m_updatable.update();
-		}
-
-	private:
-
-		/// Object to update
-		UpdatableClass& m_updatable;
-	};
+	
 
 }
 

@@ -10,7 +10,7 @@ namespace gcore
 	class Task;
 	class TaskManager;
 	class Console;
-	enum TASK_STATE;
+	enum TaskState;
 
 	/** Console Command that just help managing a Task via a Console.
 		It allow the user to link a command to the task in the console and 
@@ -37,9 +37,8 @@ namespace gcore
 
 		/** Constructor.
 			@param task Task to manage.
-			@param taskManager TaskManager to activate the task with.
 		*/
-		TaskCommand( Task& task , TaskManager& taskManager );
+		TaskCommand( Task& task );
 	
 		/** Destructor.
 		*/
@@ -56,13 +55,10 @@ namespace gcore
 
 		/** Translate task state to text.   
 		*/
-		UTFString toText( TASK_STATE taskState );
+		UTFString toText( const TaskState taskState ) const ;
 
 		/// Task to manage.
 		Task& m_task;
-
-		/// TaskManager to activate the task in.
-		TaskManager& m_taskManager;
 	
 	};
 	

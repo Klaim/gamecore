@@ -61,7 +61,7 @@ namespace gcore
 			@param immediate If true, the Event will be processed immediately. If false, the Event is registered and will
 			be processed on the next call of EventManager::processEvents().
 		 */
-		void sendEvent(EventPtr eventToSend , bool immediate=false);
+		void sendEvent(const EventPtr& eventToSend , bool immediate=false);
 
 		/** Process all buffered Events.
 			For each Event that have not been sent immediately, this will call
@@ -74,7 +74,7 @@ namespace gcore
 		/**	Cancel an Event sent.
 			@param eventToCancel Event to Cancel.
 		*/
-		void cancelEvent(EventPtr eventToCancel);
+		void cancelEvent(const EventPtr& eventToCancel);
 
 		/** Cancel all Events of the provided EventType.
 			@remark This will cancel only buffered Events as the others have already been processed.

@@ -28,7 +28,7 @@ namespace gcore
 			APPSTATE_FINISHED	,	
 		};
 
-		/// Actual state of the application.
+		/// Current state of the application.
 		APPLICATION_STATE getState() const {return m_state;}
 
 		/// Application name.
@@ -96,7 +96,7 @@ namespace gcore
 		/// Application name (and name of the application's window).
 		String m_name;
 
-		/// Actual state of the application.
+		/// Current state of the application.
 		APPLICATION_STATE m_state;	
 
 	};

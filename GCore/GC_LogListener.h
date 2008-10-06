@@ -18,7 +18,8 @@ namespace gcore
 {
 	class LogManager;
 
-	/**	Listener class for logMessage event of the Log class of a LogManager.
+	/**	TODO : review this comment!
+		Listener class for logMessage event of the Log class of a LogManager.
 			
 		This class possess the abstract method catchLogMessage,
 		which is called when the method logMessage of a log is called.
@@ -38,41 +39,53 @@ namespace gcore
 
 	class GCORE_API LogListener	
 	{
-	private:
-
-		///true if registered in LogManager with success
-		bool m_Registered;
-
-		///Managed by LogManager
-		friend class LogManager;
-	
-	protected:
-	
-		
-	
 	public:
 	
-		//true if registered in LogManager with success
-		bool isRegistered() const {return m_Registered;}
-
-		/**
-		*The methods is called when a the method logMessage of a log is called
-		*(e.g This method is an event called when a log writes data to a file).
-		*Inherit and provide an implementation of this method for managing logMessage events.
-		*@param logName The name of the Log which method logMessage has been called.
-		*@param message The message the log has to write to the file.
-		*@param logLevel The importance of the message.
+		/** TODO : review this comment!
+			The methods is called when a the method logMessage of a log is called
+			(e.g This method is an event called when a log writes data to a file).
+			Inherit and provide an implementation of this method for managing logMessage events.
+			@param logName The name of the Log which method logMessage has been called.
+			@param message The message the log has to write to the file.
+			@param logLevel The importance of the message.
 		**/
-		virtual void catchLogMessage(const String& logName,const String& message, LogMessageLevel logLevel)=0;
+		virtual void catchLogMessage(Log& log ,const String& message, LogMessageLevel logLevel)=0;
 
-		LogListener():m_Registered(false){};
+		LogListener(){};
 
 		/**
 		*The destructor is virtual in order to avoid memory problems.
 		**/
 		virtual ~LogListener(){};
-	
+
+	private:
+
 	};
+
+	/// Function-like object that can catch log messages.
+	typedef std::tr1::function< void ( Log&, const String&, LogMessageLevel ) > LogListenerFunction;
+
+	/** Proxy event listener that only redirect event catches to a provided function-like object.
+		note : seems obsolete ... should be replaced by boost::signal
+		*/
+	class ProxyLogListener : public LogListener
+	{
+	public:
+		ProxyLogListener( const LogListenerFunction& logListenerFunction )
+			: m_logListenerFunction( logListenerFunction )
+		{}
+
+		inline void catchLogMessage(Log& log ,const String& message, LogMessageLevel logLevel)
+		{
+			m_logListenerFunction( log, message, logLevel );
+		}
+
+	private:
+
+		LogListenerFunction m_logListenerFunction;
+	};
+
+
 
 }
 

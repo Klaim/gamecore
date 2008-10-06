@@ -28,6 +28,9 @@ namespace gcore
 		*/
 		~EventTask();
 
+
+		EventManager& getEventManager() { return m_eventManager; }
+
 	protected:
 
 		/** Not used.

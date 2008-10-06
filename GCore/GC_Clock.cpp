@@ -16,7 +16,7 @@ namespace gcore
 
 	}
 
-	/** Desstructor.
+	/** Destructor.
 	*/
 	Clock::~Clock()
 	{
@@ -24,13 +24,12 @@ namespace gcore
 	}
 
 	/** Clock Update (by ClockManager)
-	@param	deltaTime Delta time value (time passed since last udpate, in microseconds).
+	@param	deltaTime Delta time value (time passed since last udpate, in milliseconds).
 	*/
 	void Clock::update(TimeValue deltaTime)
 	{
-		
-		//The factor value let us speed up, slow down, inverse or stop de time flow
-		m_deltaTime = static_cast< unsigned long >(m_timeFlowFactor * static_cast<double>(deltaTime));
+		//The factor value let us speed up, slow down, inverse or stop the time flow
+		m_deltaTime = m_timeFlowFactor * deltaTime;
 		m_time += m_deltaTime;//update time
 
 	}

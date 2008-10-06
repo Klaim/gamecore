@@ -123,17 +123,17 @@ namespace gcore
 		@param immediate If true, the Event will be processed immediately. If false, the Event is registered and will
 		be processed on the next call of EventManager::processEvents().
 	*/
-	void EventManager::sendEvent( EventPtr eventToSend , bool immediate/*=false*/ )
-{
-		if(!eventToSend) GC_EXCEPTION( "Tried to send a null Event!");
+	void EventManager::sendEvent( const EventPtr& eventToSend , bool immediate/*=false*/ )
+	{
+		if(!eventToSend.get()) GC_EXCEPTION( "Tried to send a null Event!");
 
 		if(immediate)//Processing of the Event must be done NOW!
 		{
-			processEvent( EventPtr(eventToSend) );
+			processEvent( eventToSend );
 			return;
 		}
 
-		m_eventList.push_back( EventPtr(eventToSend) );
+		m_eventList.push_back( eventToSend );
 	}
 
 	/** Process all buffered Events.
@@ -159,11 +159,11 @@ namespace gcore
 	/**	Cancel an Event sent.
 		@param eventToCancel Event to Cancel.
 	*/
-	void EventManager::cancelEvent( EventPtr eventToCancel )
+	void EventManager::cancelEvent( const EventPtr& eventToCancel )
 {
 		if(!eventToCancel.get()) GC_EXCEPTION( "Tried to cancel a null Event!");
 
-		m_eventList.remove(EventPtr(eventToCancel));
+		m_eventList.remove( eventToCancel );
 		
 	}
 
@@ -175,7 +175,7 @@ namespace gcore
 
 		_Predicate_MatchEventType(EventType _type):type(_type){};
 
-		bool operator() (EventPtr& eventPtr)
+		bool operator() (const EventPtr& eventPtr)
 		{
 			if(eventPtr->getType() == type)
 				return true;

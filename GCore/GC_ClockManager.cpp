@@ -5,12 +5,12 @@ namespace gcore
 {
 
 	/** Constructor.
-	@param timeReference Provide time used as reference to update all Clocks.
+		@param timeReference Provide time used as reference to update all Clocks.
 	*/
 	ClockManager::ClockManager(const TimeReferenceProvider& timeReference)
-		: m_timeReference(timeReference),
-		m_deltaTime(0),
-		m_lastUpdateTime(0)
+		: m_timeReference(timeReference)
+		, m_deltaTime(0)
+		, m_lastUpdateTime(0)
 	{
 
 	}
@@ -59,7 +59,7 @@ namespace gcore
 	*/
 	void ClockManager::destroyClock(Clock* clock)
 	{
-		for(std::list<Clock*>::iterator it= m_clockList.begin(); it != m_clockList.end(); ++it)
+		for(std::vector<Clock*>::iterator it= m_clockList.begin(); it != m_clockList.end(); ++it)
 		{
 			if( (*it) == clock )
 			{
@@ -88,7 +88,7 @@ namespace gcore
 	void ClockManager::destroyAllClocks()
 	{
 		//delete all clocks
-		for(std::list<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it)
+		for(std::vector<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it)
 		{
 			delete (*it);
 		}
@@ -107,7 +107,7 @@ namespace gcore
 	{
 		Clock* result = nullptr;
 		
-		std::map< String, Clock* >::iterator it = m_clockIndex.find(name);
+		std::map< const String, Clock* >::iterator it = m_clockIndex.find(name);
 		if( it != m_clockIndex.end() )
 			result = it->second;
 		
@@ -115,16 +115,16 @@ namespace gcore
 	}
 
 	/** Update all Clock time.
-	@remark This should be called as frequently as possible, 
-	each main loop cycle at best.
+		@remark This should be called as frequently as possible, 
+		each main loop cycle at best.
 	*/
 	void ClockManager::updateClocks()
 	{
 		//get the new delta
-		unsigned long timeValue = m_timeReference.getTimeSinceStart();
+		TimeValue timeValue = m_timeReference.getTimeSinceStart();
 		m_deltaTime = timeValue - m_lastUpdateTime ;
 		//update clocks
-		for (std::list<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
+		for (std::vector<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
 		{
 			(*it)->update(m_deltaTime);
 						

@@ -2,6 +2,8 @@
 #define GCORE_EVENTLISTENER_H
 #pragma once
 
+#include <functional>
+
 #include "GC_Common.h"
 #include "GC_Event.h"
 
@@ -53,6 +55,30 @@ namespace gcore
 
 		///Event type to catch once registered in an EventManager.
 		const EventType eventTypeToCatch;
+	};
+
+	/// Function-like object that can catch events.
+	typedef std::tr1::function< void (const EventPtr& , EventManager& ) > EventListenerFunction;
+
+	/** Proxy event listener that only redirect event catches to a provided function-like object.
+		note : seems obsolete ... should be replaced by boost::signal
+	*/
+	class ProxyEventListener : EventListener
+	{
+	public:
+		ProxyEventListener( const EventListenerFunction& catherFunction, EventType eventType )
+			: EventListener( eventType )
+			, m_catcherFunction( catherFunction )
+		{}
+
+		inline void catchEvent(const EventPtr& eventToProcess, EventManager& eventManager)
+		{
+			m_catcherFunction( eventToProcess, eventManager );
+		}
+
+	private:
+		
+		EventListenerFunction m_catcherFunction;
 	};
 
 }

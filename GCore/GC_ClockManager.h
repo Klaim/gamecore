@@ -4,7 +4,7 @@
 
 #include <map>
 #include "GC_String.h"
-#include <list>
+#include <vector>
 
 #include "GC_Common.h"
 #include "GC_TimeReferenceProvider.h"
@@ -54,21 +54,21 @@ namespace gcore
 		void updateClocks();
 
 		
-		/** @return Time value of the last update, from TimeReferenceProvider (in microseconds).
+		/** @return Time value of the last update, from TimeReferenceProvider (in milliseconds).
 		*/
-		unsigned long getLastUpdateTime(){return m_lastUpdateTime;}
+		TimeValue getLastUpdateTime(){return m_lastUpdateTime;}
 
-		/** @return Time elapsed between the last update and the previous one (in microseconds).
+		/** @return Time elapsed between the last update and the previous one (in milliseconds).
 		*/
-		unsigned long getDeltaTime(){return m_deltaTime;}
+		TimeValue getDeltaTime(){return m_deltaTime;}
 
 		/** Return the registered Clock list.
 		*/
-		const std::list<Clock*>& getClockList() const {return m_clockList;}
+		const std::vector<Clock*>& getClockList() const {return m_clockList;}
 
 		/** Return the named index of all named clocks registered.
 		*/
-		const std::map< String , Clock*>& getNamedClocksIndex() const {return m_clockIndex;}
+		const std::map< const String , Clock*>& getNamedClocksIndex() const {return m_clockIndex;}
 
 
 		/** Constructor.
@@ -92,20 +92,20 @@ namespace gcore
 
 		/** Named index of all the Clocks.
 		*/
-		std::map< String, Clock* > m_clockIndex;
+		std::map< const String, Clock* > m_clockIndex;
 
 		/** List of all Clocks created by this ClockManager.
 		*/
-		std::list< Clock* > m_clockList;
+		std::vector< Clock* > m_clockList;
 
 
-		/** Time value of the last update, from TimeReferenceProvider (in microseconds).
+		/** Time value of the last update, from TimeReferenceProvider (in milliseconds).
 		*/
-		unsigned long m_lastUpdateTime;
+		TimeValue m_lastUpdateTime;
 
-		/** Time elapsed between the last update and the previous one (in microseconds).
+		/** Time elapsed between the last update and the previous one (in milliseconds).
 		*/
-		unsigned long m_deltaTime;
+		TimeValue m_deltaTime;
 
 	};
 

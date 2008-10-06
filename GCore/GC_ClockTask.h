@@ -43,7 +43,7 @@ namespace gcore
 		/** Update the EventManager by calling ClockManager::updateClocks().		
 			@see EventManager
 		*/
-		virtual void execute();
+		void execute();
 
 	private:
 

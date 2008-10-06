@@ -30,7 +30,7 @@ namespace gcore
 		~FixedTimeProvider(){}
 
 		/** Time passed since the system started (or other base time reference, implementation-specific).
-			@return Time value (in microseconds).
+			@return Time value (in milliseconds).
 		*/
 		TimeValue getTimeSinceStart() const 
 		{
