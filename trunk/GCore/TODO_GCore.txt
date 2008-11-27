@@ -3,6 +3,7 @@ GCore Project
 ========================================================================
 
 TODO :
+- this line is just a test
 
 - look for places where those libs have an appropriate use or boost replace:
 	- std::tr1::unordered_map
