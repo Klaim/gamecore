@@ -7,9 +7,9 @@
 namespace gcore
 {
 		
-	/** Singleton : class with an unique occurency.
+	/** Singleton : class with an unique occurrence.
 		
-		A Singleton class MyClass should heritate from Singleton<T> 
+		A Singleton class MyClass should inherit from Singleton<T> 
 		like the following example :
 		\code
 		class Myclass : public Singleton<MyClass>
@@ -43,7 +43,7 @@ namespace gcore
 		public:
 			static inline void create()
 			{
-				if(ms_singleton)return;
+				GC_ASSERT( ms_singleton == nullptr , "Tried to create a singleton twice!" );
 				new T();
 			}
 			static inline T& instance()
@@ -53,7 +53,8 @@ namespace gcore
 			}
 			static inline void destroy()
 			{
-				if(ms_singleton)delete ms_singleton;
+				GC_ASSERT( ms_singleton , "Tried to destroy a singleton before creating it!" );
+				delete ms_singleton;
 				ms_singleton = nullptr;
 			}
 			static inline bool isValid()

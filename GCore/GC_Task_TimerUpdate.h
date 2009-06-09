@@ -1,5 +1,5 @@
-#ifndef GC_TIMERTASK_H
-#define GC_TIMERTASK_H
+#ifndef GC_TASK_TIMERUPDATE_H
+#define GC_TASK_TIMERUPDATE_H
 #pragma once
 
 #include "GC_Common.h"
@@ -14,18 +14,18 @@ namespace gcore
 		@see TimerManager
 
 	*/
-	class GCORE_API TimerTask  : public Task
+	class GCORE_API Task_TimerUpdate  : public Task
 	{
 	public:
 
 		/** Constructor.
 			@param timerManager TimerManager to update.
 		*/
-		TimerTask( TimerManager& timerManager,  TaskPriority priority = 0 ,const String& name = "" );
+		Task_TimerUpdate( TimerManager& timerManager,  TaskPriority priority = 0 ,const String& name = "" );
 	
 		/** Destructor.
 		*/
-		~TimerTask();
+		~Task_TimerUpdate();
 		
 	protected:
 

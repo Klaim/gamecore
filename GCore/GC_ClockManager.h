@@ -5,7 +5,6 @@
 #include <map>
 #include <vector>
 #include "GC_String.h"
-#include <boost/pool/poolfwd.hpp>
 
 #include "GC_Common.h"
 #include "GC_TimeReferenceProvider.h"
@@ -21,8 +20,6 @@ namespace gcore
 	class GCORE_API ClockManager
 	{
 	public:
-
-		typedef boost::object_pool< Clock > ClockPool;
 
 		/** Create a Clock object.
 			The name of the Clock must be unique for this ClockManager,
@@ -56,14 +53,31 @@ namespace gcore
 		*/
 		void updateClocks();
 
-		
-		/** @return Time value of the last update, from TimeReferenceProvider (in milliseconds).
-		*/
-		TimeValue getLastUpdateTime(){return m_lastUpdateTime;}
 
-		/** @return Time elapsed between the last update and the previous one (in milliseconds).
+		/** Reset all clocks.
 		*/
-		TimeValue getDeltaTime(){return m_deltaTime;}
+		void reset();
+
+		
+		/** @return Time value of the last update, from TimeReferenceProvider (in seconds).
+		*/
+		TimeValue getLastUpdateTime() const {return m_lastUpdateTime;}
+
+		/** @return Time elapsed between the last update and the previous one (in seconds).
+		*/
+		TimeValue getDeltaTime() const {return m_deltaTime;}
+
+		/** @return Maximum time elapsed or 0 or negative value if no limit set (default).                                                                     
+		*/
+		TimeValue getMaxDeltaTime() const { return m_max_deltaTime; }
+
+		/** Set a maximum limit to the possible delta time or 0 for no limit (default).
+		*/
+		void setMaxDeltaTime( TimeValue maxDeltaTime )
+		{
+			GC_ASSERT( maxDeltaTime >= 0, "Max delta time have to be 0 or positive!");
+			m_max_deltaTime = maxDeltaTime;
+		}
 
 		/** Return the registered Clock list.
 		*/
@@ -101,16 +115,14 @@ namespace gcore
 		*/
 		std::vector< Clock* > m_clockList;
 
-		/** Clock pool. */
-		ClockPool* m_clockPool;
-
-		/** Time value of the last update, from TimeReferenceProvider (in milliseconds).
-		*/
+		/// Time value of the last update, from TimeReferenceProvider (in seconds).
 		TimeValue m_lastUpdateTime;
 
-		/** Time elapsed between the last update and the previous one (in milliseconds).
-		*/
+		/// Time elapsed between the last update and the previous one (in seconds).
 		TimeValue m_deltaTime;
+
+		/// Maximum time elapsed allowed, or 0 or negative value if no limit set.
+		TimeValue m_max_deltaTime;
 
 	};
 

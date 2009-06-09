@@ -77,7 +77,7 @@ namespace gcore
 		void setEndPoint( const StateType& endPoint ) { m_endPoint = endPoint; }
 
 		/** Length of ONE period of this curve.  */
-		virtual SpaceUnitType length() const = 0;
+		virtual SpaceUnitType length( const unsigned long precision = 100) const = 0;
 
 	protected:
 

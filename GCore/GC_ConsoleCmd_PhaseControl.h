@@ -1,16 +1,16 @@
-#ifndef GC_PHASECOMMAND_H
-#define GC_PHASECOMMAND_H
+#ifndef GC_CONSOLECMD_PHASECONTROL_H
+#define GC_CONSOLECMD_PHASECONTROL_H
 #pragma once
 
 #include "GC_Common.h"
 
 #include "GC_ConsoleCommand.h"
+#include "GC_Phase.h"
 
 namespace gcore
 {
-	class Phase;
 	class Console;
-	enum PhaseState;
+	
 
 	/** Console Command that just help managing a Phase via a Console.
 		It allow the user to link a command to the phase in the console and 
@@ -31,20 +31,22 @@ namespace gcore
 		@see ConsoleCommand	@see Console
 		@see Phase @see Phase::
 	*/
-	class GCORE_API PhaseCommand : public ConsoleCommand
+	class GCORE_API ConsoleCmd_PhaseControl : public ConsoleCommand
 	{
 	public:
 
 		/** Constructor.
 			@param phase Phase to manage.
 		*/
-		PhaseCommand( Phase& phase );
+		ConsoleCmd_PhaseControl( const LocalizedString& name, Phase& phase );
 	
 		/** Destructor.
 		*/
-		~PhaseCommand();
+		~ConsoleCmd_PhaseControl();
 
-		void execute( Console & console , const std::vector< UTFString >& parameterList);
+		bool execute( Console & console , const std::vector< LocalizedString >& parameterList);
+
+		LocalizedString help() const;
 
 	protected:
 		
@@ -55,7 +57,7 @@ namespace gcore
 
 		/** Translate phase state to text.   
 		*/
-		UTFString toText( const PhaseState phaseState ) const ;
+		LocalizedString toText( const Phase::State phaseState ) const ;
 
 		/// Phase to manage.
 		Phase& m_phase;

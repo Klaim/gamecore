@@ -115,6 +115,9 @@ namespace gcore
 		inline TaskManager* getTaskManager() const { return m_taskManager; };
 	
 
+		bool isActive() const { return m_state == TS_ACTIVE; }
+		bool isPaused() const { return m_state == TS_PAUSED; }
+		bool isRegistered() const { return m_state != TS_UNREGISTERED; }
 
 	protected:
 

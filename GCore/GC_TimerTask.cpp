@@ -1,28 +1,28 @@
-#include "GC_TimerTask.h"
+#include "GC_Task_TimerUpdate.h"
 
 namespace gcore
 {
-	TimerTask::TimerTask( TimerManager& timerManager,  TaskPriority priority ,const String& name )
+	Task_TimerUpdate::Task_TimerUpdate( TimerManager& timerManager,  TaskPriority priority ,const String& name )
 	: Task( priority, name )
 		, m_timerManager( timerManager )
 	{ }
 
-	TimerTask::~TimerTask()
+	Task_TimerUpdate::~Task_TimerUpdate()
 	{
 
 	}
 
-	void TimerTask::onActivate()
+	void Task_TimerUpdate::onActivate()
 	{
 
 	}
 
-	void TimerTask::onTerminate()
+	void Task_TimerUpdate::onTerminate()
 	{
 
 	}
 
-	void TimerTask::execute()
+	void Task_TimerUpdate::execute()
 	{ 
 		m_timerManager.updateTimers(); 
 	}

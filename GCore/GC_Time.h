@@ -15,7 +15,7 @@ namespace gcore
 	typedef double TimeValue;
 
 	/// Type for time flow factor value.
-	typedef float TimeFlowFactor;
+	typedef double TimeFlowFactor;
 
 }
 

@@ -31,20 +31,20 @@ namespace gcore
 		@see ConsoleCommand	@see Console
 		@see Task @see Task::
 	*/
-	class GCORE_API TaskCommand : public ConsoleCommand
+	class GCORE_API ConsoleCmd_TaskControl : public ConsoleCommand
 	{
 	public:
 
 		/** Constructor.
 			@param task Task to manage.
 		*/
-		TaskCommand( Task& task );
+		ConsoleCmd_TaskControl( const LocalizedString& name, Task& task );
 	
 		/** Destructor.
 		*/
-		~TaskCommand();
+		~ConsoleCmd_TaskControl();
 
-		void execute( Console & console , const std::vector< UTFString >& parameterList);
+		bool execute( Console & console , const std::vector< LocalizedString >& parameterList);
 
 	protected:
 		
@@ -55,7 +55,9 @@ namespace gcore
 
 		/** Translate task state to text.   
 		*/
-		UTFString toText( const TaskState taskState ) const ;
+		LocalizedString toText( const TaskState taskState ) const ;
+
+		LocalizedString help() const;
 
 		/// Task to manage.
 		Task& m_task;

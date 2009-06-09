@@ -1,5 +1,5 @@
-#ifndef GC_AUTOMOVE_H
-#define GC_AUTOMOVE_H
+#ifndef GC_INTERPOLATOR_H
+#define GC_INTERPOLATOR_H
 #pragma once
 
 
@@ -8,25 +8,25 @@
 namespace gcore
 {
 	
-	/** 
+	/** Automatic interpolation.
 	*/
 	template < typename StateType , typename SpaceUnitType = float >
-	class AutoMove 
+	class Interpolator 
 	{
 	public:
 
 		/** Constructor with zero-initialization.   
 		*/
-		AutoMove(): m_state() { }
+		Interpolator(): m_state() { }
 		
 		/** Constructor with defined initialization.   
 		*/
-		AutoMove( const StateType& initialState )
+		Interpolator( const StateType& initialState )
 			: m_state( initialState )
 		{
 		}
 
-		virtual ~AutoMove()	{ }
+		virtual ~Interpolator()	{ }
 	
 
 		void update( StateType& state )

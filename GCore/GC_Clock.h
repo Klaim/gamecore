@@ -26,7 +26,7 @@ namespace gcore
 	
 	public:
 
-		/** @return Virtual milliseconds passed since the clock initialization.
+		/** @return Virtual seconds passed since the clock initialization.
 		 */
 		const TimeValue& getTime() const{ return m_time; }
 
@@ -38,17 +38,29 @@ namespace gcore
 		*/
 		const TimeValue& getDeltaTime() const { return m_deltaTime;}
 
+		/** @return Maximum virtual time elapsed or 0 or negative value if no limit set (default).                                                                     
+		*/
+		TimeValue getMaxDeltaTime() const { return m_max_deltaTime; }
+
 		/** Time flow factor.
 			@param	factor New flow factor value.
 		 */
 		void setTimeFlowFactor(TimeFlowFactor factor){m_timeFlowFactor=factor;}
 
 		
-		/** Reset Time to 0 milliseconds elapsed.
+		/** Set a maximum limit to the possible virtual delta time or 0 or negative value for no limit (default).
+		*/
+		void setMaxDeltaTime( TimeValue maxDeltaTime )
+		{
+			GC_ASSERT( maxDeltaTime >= 0, "Max delta time have to be 0 or positive!");
+			m_max_deltaTime = maxDeltaTime;
+		}
+		
+		/** Reset Time to 0 seconds elapsed.
 		 */
-		void reset(){m_time=0; }
+		void reset(){ m_time=0; }
 
-		/** Virtual milliseconds passed since the clock initialization.
+		/** Virtual seconds passed since the clock initialization.
 			@param time New value.
 		*/
 		void setTime(TimeValue time){m_time=time;}
@@ -56,38 +68,44 @@ namespace gcore
 		/** @return Clock's name.
 		*/
 		const String& getName() const {return m_name;}
-		
+
+		/** @copydoc m_clockManager */
+		const ClockManager& getClockManager() const { return m_clockManager; }
+		ClockManager& getClockManager() { return m_clockManager; }
+
 	private:
-
-		/** Clock's name.
-		*/
-		String m_name;
-
-		/** Virtual milliseconds passed since the clock initialization.
-		 */
-		TimeValue m_time;
-
-		/** Time flow factor.
-		 */
-		TimeFlowFactor m_timeFlowFactor;
-
-		/** Virtual delta time (from the last update and flow factor dependant).
-		*/
-		TimeValue m_deltaTime;
-
 		///Managed by ClockManager only.
 		friend class ClockManager;
-		friend typedef ClockManager::ClockPool;
+
+		/// Clock manager that created, manage and will destroy this Clock.
+		ClockManager& m_clockManager;
+
+		/// Clock's name.
+		String m_name;
+
+		/// Virtual seconds passed since the clock initialization.
+		TimeValue m_time;
+
+		/// Time flow factor.
+		TimeFlowFactor m_timeFlowFactor;
+
+		/// Virtual delta time (from the last update and flow factor dependent).
+		TimeValue m_deltaTime;
+
+		/// Maximum time elapsed allowed, or 0 or negative value if no limit set.
+		TimeValue m_max_deltaTime;
+
 
 		/** Clock Update (by ClockManager)
-			@param	deltaTime Delta time value (time passed since last udpate, in milliseconds).
+			@param	deltaTime Delta time value (time passed since last update, in seconds).
 		 */
 		void update(TimeValue deltaTime);
 
-		/** Construtor.
+		/** Constructor.
 			@param name Clock's name.
+			@param clockmanager Clock manager that created, manage and will destroy this Clock.
 		*/
-		Clock(const String& name);
+		Clock(const String& name, ClockManager& clockManager );
 		
 		/** Destructor.
 		*/
@@ -96,7 +114,17 @@ namespace gcore
 
 	};
 
+	/// Helper function to destroy a clock cleanly
+	inline void destroyClock( Clock* clock )
+	{ 
+		GC_ASSERT( clock != nullptr, "Tried to destroy a null clock!" );
+		clock->getClockManager().destroyClock(clock);
+	}
 
+	inline void destroyClock( Clock& clock )
+	{
+		destroyClock( &clock );
+	}
 }
 
 #endif

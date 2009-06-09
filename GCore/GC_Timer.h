@@ -32,6 +32,7 @@ namespace gcore
 
 	class ProxyTimerListener : public TimerListener
 	{
+	public:
 		ProxyTimerListener( const TimerListenerFunction& timerListenerFunction  )
 			: m_timerListenerFunction( timerListenerFunction )
 		{ }

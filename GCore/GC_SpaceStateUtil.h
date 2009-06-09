@@ -11,36 +11,13 @@ class SpaceStateUtil
 {
 public:
 
-	StateType normalize(const StateType& coord) const
-	{
-		GC_FORCE_IMPLEMENTATION;
-		return StateType;
-	}
+	StateType normalize(const StateType& coord) const;
+	SpaceUnitType delta(const StateType& coordA, const StateType& coordB) const;
+	StateType deltaState(const StateType& coordA, const StateType& coordB) const;
+	StateType move( const StateType& state, const StateType& difference ) const;
 
-	SpaceUnitType delta(const StateType& coordA, const StateType& coordB) const
-	{
-		GC_FORCE_IMPLEMENTATION;
-		return SpaceUnitType;
-	}
+	StateType moveForward( const StateType& state, const SpaceUnitType& difference ) const;
 
-	StateType deltaState(const StateType& coordA, const StateType& coordB) const
-	{
-		GC_FORCE_IMPLEMENTATION;
-		return StateType;
-	}
-
-
-	StateType move( const StateType& state, const StateType& difference ) const
-	{
-		GC_FORCE_IMPLEMENTATION;
-		return state;
-	}
-
-	StateType moveForward( const StateType& state, const SpaceUnitType& difference ) const
-	{
-		GC_FORCE_IMPLEMENTATION;
-		return state;
-	}
 }; 
 
 template<>

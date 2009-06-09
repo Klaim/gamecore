@@ -28,7 +28,7 @@ namespace gcore
 		}
 		~Line(){}
 
-		inline SpaceUnitType length() const 
+		inline SpaceUnitType length( const unsigned long precision = 100 ) const 
 		{ 
 			const SpaceStateUtil< StateType, SpaceUnitType > posUtil;
 			return posUtil.delta( m_beginPoint, m_endPoint );

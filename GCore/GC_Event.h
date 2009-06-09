@@ -2,7 +2,7 @@
 #define GCORE_EVENT_H
 #pragma once
 
-//#include <boost/shared_ptr.hpp>
+//#include <memory>
 #include <memory>
 
 #include "GC_Common.h"
@@ -54,7 +54,7 @@ namespace gcore
 
 	/** Smart pointer for Event objects.
 	*/
-	//typedef  boost::shared_ptr<Event> EventPtr;
+	//typedef  std::tr1::shared_ptr<Event> EventPtr;
 	typedef  std::tr1::shared_ptr<Event> EventPtr;
 
 }

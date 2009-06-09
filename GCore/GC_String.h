@@ -4,16 +4,17 @@
 
 #include <string>
 
+#include "GC_CrossPlatform.h"
+
 namespace gcore
 {
+	// change that once C++0x is here!
+	typedef wchar_t UTF16_char;
 
-	/// Character type used for Unicode strings in gcore.
-	typedef wchar_t UTF_CHAR;
-	
-	/// Unicode string used in gcore.
-	typedef std::basic_string< UTF_CHAR > UTFString;
+	/// Unicode string used in gcore : UTF-16 encoding.
+	typedef std::basic_string< UTF16_char > LocalizedString;
 
-	/// String type used int gcore.
+	/// String type used in gcore.
 	typedef std::string String;
 
 }

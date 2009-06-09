@@ -11,7 +11,7 @@ namespace gcore
 	*/
 
 	/** Convert a number to string using basic STL conversion (std::basic_stringstream)
-		@see String @see UTFString @see std::basic_stringstream
+		@see String @see LocalizedString @see std::basic_stringstream
 	*/
 	template< typename NumType >
 	inline String numToString( const NumType& number )
@@ -24,7 +24,7 @@ namespace gcore
 	/** @copydoc numToString   
 	*/
 	template< typename NumType >
-	inline UTFString numToUTFString( const NumType& number )
+	inline LocalizedString numToUTFString( const NumType& number )
 	{
 		std::wstringstream converterStream;
 		converterStream << number;

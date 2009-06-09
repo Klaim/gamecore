@@ -9,13 +9,13 @@
 
 namespace gcore
 {
-namespace automove
+namespace interpolation
 {
 	/** No documentation yet.
 	*/
 	template< typename StateType , typename SpaceUnitType >
 	class RelativityControl_Speed 
-		: virtual public AutoMove< StateType, SpaceUnitType >
+		: virtual public Interpolator< StateType, SpaceUnitType >
 		, public RelativityControl_TimeBased< StateType , SpaceUnitType >
 	{
 	public:
@@ -25,7 +25,7 @@ namespace automove
 		static inline SpaceUnitType NoAcceleration( const TimeValue&, const RelativityControl_Speed& ){ return SpaceUnitType(); }
 		
 		RelativityControl_Speed( Clock* clock )
-			: AutoMove()
+			: Interpolator()
 			, RelativityControl_TimeBased( clock )
 			, m_accelerationFunction( &RelativityControl_Speed::NoAcceleration )
 			, m_speed(0)
@@ -37,7 +37,7 @@ namespace automove
 		}
 
 		RelativityControl_Speed(const StateType& state, Clock* clock )
-			: AutoMove( state )
+			: Interpolator( state )
 			, RelativityControl_TimeBased( clock )
 			, m_accelerationFunction( &RelativityControl_Speed::NoAcceleration )
 			, m_speed(0)

@@ -7,10 +7,12 @@
 ***********************************************/
 
 
-//nullptr definition:
+//nullptr definition: (see C++0x)
 #ifndef nullptr
 	#define nullptr NULL
 #endif
+
+
 
 //////////////////////////////////////////////////////////////////////////
 

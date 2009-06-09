@@ -18,7 +18,7 @@ namespace gcore
 	{
 	public:
 		/** Time passed since the system started (or other base time reference, implementation-specific).
-			@return Time value (in milliseconds).
+			@return Time value (in seconds).
 		*/
 		virtual TimeValue getTimeSinceStart() const = 0;
 

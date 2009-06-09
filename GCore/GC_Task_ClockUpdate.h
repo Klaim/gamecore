@@ -1,5 +1,5 @@
-#ifndef GCORE_CLOCKTASK_H
-#define GCORE_CLOCKTASK_H
+#ifndef GCORE_TASK_CLOCK_UPDATE_H
+#define GCORE_TASK_CLOCK_UPDATE_H
 #pragma once
 
 #include "GC_Common.h"
@@ -16,7 +16,7 @@ namespace gcore
 	@see ClockManager
 
 	*/
-	class GCORE_API ClockTask  : public Task
+	class GCORE_API Task_ClockUpdate  : public Task
 	{
 	public:
 		/** Constructor.
@@ -24,11 +24,11 @@ namespace gcore
 			@param priority Task priority for this clock update.
 			@param name Name of this task.
 		*/
-		ClockTask(ClockManager& clockManager, TaskPriority priority = 0 ,const String& name = "" );
+		Task_ClockUpdate(ClockManager& clockManager, TaskPriority priority = 0 ,const String& name = "" );
 
 		/** Destruction.
 		*/
-		~ClockTask();
+		~Task_ClockUpdate();
 
 	protected:
 

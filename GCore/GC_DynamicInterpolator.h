@@ -19,18 +19,18 @@ namespace gcore
 		< typename StateType
 		, typename SpaceUnitType = float 
 		>
-	class DynamicAutoMove
-		: public automove::RelativityControl_Speed< StateType, SpaceUnitType >
-		, public automove::TrajectoryControl_Target< StateType, SpaceUnitType >
+	class DynamicInterpolator
+		: public interpolation::RelativityControl_Speed< StateType, SpaceUnitType >
+		, public interpolation::TrajectoryControl_Target< StateType, SpaceUnitType >
 	{
 	public:
 
-		DynamicAutoMove( Clock* clock = nullptr)
+		DynamicInterpolator( Clock* clock = nullptr)
 			: RelativityControl_Speed( clock )
 			, TrajectoryControl_Target()
 		{ }
 
-		DynamicAutoMove( const StateType& state, Clock* clock = nullptr) 
+		DynamicInterpolator( const StateType& state, Clock* clock = nullptr) 
 			: RelativityControl_Speed( state, clock )
 			, TrajectoryControl_Target( state )
 		{
