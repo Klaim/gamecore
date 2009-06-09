@@ -1,21 +1,21 @@
-#include "GC_ClockTask.h"
+#include "GC_Task_ClockUpdate.h"
 
 namespace gcore
 {
-	ClockTask::ClockTask( ClockManager& eventManager, TaskPriority priority /*= 0 */,const String& name /*= "" */ ) 
+	Task_ClockUpdate::Task_ClockUpdate( ClockManager& eventManager, TaskPriority priority /*= 0 */,const String& name /*= "" */ ) 
 		:Task( priority , name ),
 		m_clockManager(eventManager)
 	{
 
 	}
 
-	ClockTask::~ClockTask()
+	Task_ClockUpdate::~Task_ClockUpdate()
 	{
 
 	}
 
 
-	void ClockTask::execute()
+	void Task_ClockUpdate::execute()
 	{
 		m_clockManager.updateClocks();
 	}

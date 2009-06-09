@@ -10,6 +10,7 @@
 #include "GC_String.h"
 #include <map>
 #include <vector>
+#include <functional>
 #include "GC_Common.h"	
 
 

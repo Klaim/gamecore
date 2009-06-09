@@ -14,26 +14,33 @@ namespace gcore
 	{
 	public:
 		/** Current state of application. */
-		enum APPLICATION_STATE 
+		enum State
 		{
 			/// The application have not been initialized before and has not run.
-			APPSTATE_READY			,	
+			State_Ready			,	
 			/// Initialization is in progress.
-			APPSTATE_INITIALIZING	,
+			State_Initialisation	,
 			/// Running the main Loop (in Run() ).
-			APPSTATE_RUNNING,		
+			State_Running,		
 			///Termination is in progress.
-			APPSTATE_TERMINATING,	
+			State_Termination,	
 			///The application has been run and terminated.
-			APPSTATE_FINISHED	,	
+			State_Finished	,	
 		};
 
 		/// Current state of the application.
-		APPLICATION_STATE getState() const {return m_state;}
+		State getState() const {return m_state;}
 
+		bool isRunning() const { return m_state == State_Running; }
+		
 		/// Application name.
 		const String& getName() const {return m_name;}
 
+		/// Provide text version informations.
+		virtual String getVersionName() const { return "Undefined"; }
+
+		/// Provide text version build infos.
+		virtual String getBuildInfos() const { return "Undefined";}
 
 		/** Constructor.
 			@param name Name of the application.
@@ -47,11 +54,11 @@ namespace gcore
 		//////////////////////////////////////////////////////////////////////////
 
 
-		/** Start the application and go through the main loop until exit() is called.
+		/** Start the application and go through the main loop until end() is called.
 			This method will : 
 			- call initialize() for user defined initialization;
 			- start a loop that will call mainLoop() each cycle;
-			- exit the loop when State == APPSTATE_TERMINATING, by calling exit() for example;
+			- end the loop when State == State_Termination, by calling end() for example;
 			- call terminate() for user defined application termination;
 			@remark If initialize(), terminate() or mainLoop() fail by returning anything else than 0, 
 			this function will just return the failed function return value. No termination() will be
@@ -60,13 +67,13 @@ namespace gcore
 		*/
 		virtual int run();
 
-		/** End the application by setting it's state to APPSTATE_TERMINATING.
-			@remark Only if it's state is APPSTATE_RUNNING (Else will not do anything).
-			The main loop will then stop, call termination functions and exit, 
+		/** End the application by setting it's state to State_Termination.
+			@remark Only if it's state is State_Running (Else will not do anything).
+			The main loop will then stop, call termination functions and end, 
 			as explained in run() function.
 			@see run
 		*/
-		virtual void exit();
+		virtual void end();
 
 	protected:
 
@@ -85,7 +92,7 @@ namespace gcore
 
 		/** User defined Main Loop.
 			This should define the main loop process.
-			@remark Use exit() to exit the main loop.
+			@remark Use end() to end the main loop.
 			@return Must return 0 on success, anything else on failure.
 		*/
 		virtual int mainLoop() = 0;
@@ -94,10 +101,10 @@ namespace gcore
 	private:
 
 		/// Application name (and name of the application's window).
-		String m_name;
+		const String m_name;
 
 		/// Current state of the application.
-		APPLICATION_STATE m_state;	
+		State m_state;	
 
 	};
 

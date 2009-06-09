@@ -18,7 +18,7 @@ namespace gcore
 		// in a task manager.
 		// This test is not ideal but should warn the user about ninja task manipulations
 		// occurence. 
-		GC_ASSERT ( m_taskManager == nullptr && m_state == TS_UNREGISTERED , String("Task destroyed while registered in a TaskManager! Task name :") + m_name );
+		//GC_ASSERT ( m_taskManager == nullptr && m_state == TS_UNREGISTERED , String("Task destroyed while registered in a TaskManager! Task name :") + m_name );
 		
 	}
 

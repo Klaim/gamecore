@@ -1,43 +1,36 @@
-#include <boost/tokenizer.hpp>
 #include "GC_Console.h"
+
+#include <cmath>
+#include <boost/tokenizer.hpp>
+#include <boost/algorithm/string.hpp>
+
+#include "GC_ConsoleCmd_Help.h"
 
 namespace gcore
 {
-
-	
-	const UTFString Console::DEFAULT_PREFIX( L"/" );
+	const LocalizedString Console::DEFAULT_PREFIX( L"/" );
 
 	Console::Console(unsigned long maxEntries , unsigned long maxEntryLength  , unsigned long maxTexts )
-		: m_Entry(  )
-		, m_MaxEntries( maxEntries )
-		, m_MaxEntryLength(maxEntryLength)
-		, m_MaxTexts(maxTexts)
-		, m_LastEntries( maxEntries )
-		, m_LastTexts( maxTexts )
+		: m_entry()
+		, m_maxEntries( maxEntries )
+		, m_maxEntryLength(maxEntryLength)
+		, m_maxTexts(maxTexts)
+		, m_lastEntries( maxEntries )
+		, m_lastTexts( maxTexts )
+		, m_commandCallPrefix( DEFAULT_PREFIX )
+		, m_cursorPos( 0 )
+		, m_entryHistoryCursorPos( 0 )
+		, m_printCommandOnExecute( true )
 	{
-		m_DefaultCommand.reset();
-		addCommandPrefix( DEFAULT_PREFIX );
-
-		//optimizeMemory();
-		m_CommandPrefixList.reserve( 8 ); // this is arbitrary
 		m_paramList.resize( 8 ); // this is arbitrary
 		for( int i = 0; i < 8 ; ++i )
 		{
-			m_paramList[i].reserve(m_MaxEntryLength);
+			m_paramList[i].reserve(m_maxEntryLength);
 		}
 
 		// memory optimization
-		m_Entry.reserve( maxEntryLength );
+		m_entry.reserve( maxEntryLength );
 		
-		
-		for( size_t i = 0; i < m_MaxEntries ; ++i )
-		{
-			m_LastEntries[i].reserve( m_MaxEntryLength );
-		}
-		for( size_t i = 0; i < m_MaxTexts ; ++i )
-		{
-			m_LastTexts[i].reserve( m_MaxEntryLength );
-		}
 	}
 
 	
@@ -48,82 +41,81 @@ namespace gcore
 	}
 
 
-	void Console::parseParams(const UTFString& paramString, std::vector< UTFString >& paramList,const UTFString& paramSeparators)
+	void Console::parseParameters(const LocalizedString& paramString, std::vector< LocalizedString >& paramList,const LocalizedString& paramSeparators)
 	{
-		/*using namespace boost;
-
-		tokenizer<char_delimiters_separator<UTF_CHAR>> tok(paramString);
-		for(tokenizer<>::iterator beg=tok.begin(); beg!=tok.end();++beg)
-		{
-		paramList.push_back((*beg));
-		}*/
-		//clear param list first!
-		/*for( size_t k=0; k < paramList.size(); ++k)
-		{
-			paramList[k] = L"";
-		}
-		*/
 		paramList.clear();
 
-		typedef boost::tokenizer< boost::char_separator<UTF_CHAR>, UTFString::const_iterator,	UTFString > my_tok;
+		typedef boost::tokenizer< boost::char_separator<LocalizedString::value_type>, LocalizedString::const_iterator,	LocalizedString > my_tok;
 
-		boost::char_separator<UTF_CHAR> sep( paramSeparators.c_str() );
+		boost::char_separator<LocalizedString::value_type> sep( paramSeparators.c_str() );
 		my_tok tok( paramString, sep );
 
 		//unsigned int i = 0;
 		for ( my_tok::iterator it = tok.begin();it != tok.end();++it )
 		{
-			/*if(i>=paramList.size())
-			{
-				//memory optimization
-				paramList[i] = L"";
-				for( unsigned int k=i; k < paramList.size(); ++k)
-				{
-					paramList[k].reserve(m_MaxEntryLength);
-				}
-			}
-			paramList[i] = (*it) ;
-			*/
 			paramList.push_back( (*it) );
 		};
 
 	}
 	
-	long Console::passKeys(const UTFString& keys)
+	long Console::injectKeys(const LocalizedString& keys)
 	{
 		if(keys.empty())return 0;
 
 
 		long result = 0;
 
-		long l = long(keys.length() + m_Entry.length()) - m_MaxEntryLength;
+		const unsigned long totalLength = static_cast< unsigned long >( keys.length() + m_entry.length() );
+		const long overLength = totalLength - static_cast< long >( m_maxEntryLength );
 
-		if(l>0)// we don't take all the characters
+		if( overLength > 0 )// we don't take all the characters
 		{
-			m_Entry += keys.substr(0, m_MaxEntryLength - (keys.length() + m_Entry.length()) );	
-
-			result = l;
+			const unsigned long finalLength = static_cast<unsigned long>( keys.length() - overLength );
+			if( finalLength > 0 )
+			{
+				const LocalizedString finalKeys = keys.substr( 0, finalLength );	
+				insertEntryText( finalKeys );
+			}
+			
+			result = overLength;
 		}
-		else m_Entry += keys;
+		else insertEntryText( keys ); // we take it all!
 
 		onEntryChanged();
 
 		return result;
 	}
 
-	void Console::printText(const UTFString& text)
+
+	void Console::insertEntryText( const LocalizedString& text )
+	{
+		GC_ASSERT( m_cursorPos <= m_entry.length(), "Tried to insert text in an invalid location of the entry!" );
+
+		if( m_cursorPos < m_entry.length() )
+		{
+			m_entry.insert( m_cursorPos, text );	
+		}
+		else
+		{
+			// cursor at the end of the entry
+			m_entry += text;
+		}
+		
+		moveCursor( static_cast<unsigned long>( text.length() ) );
+	}
+
+
+	void Console::printText(const LocalizedString& text)
 	{
 		if( text.empty() ) // do nothing if empty
 			return;
 
-		UTFString textToPrint( text );
+		LocalizedString textToPrint( text );
 
-		if( textToPrint.length() > m_MaxEntryLength ) textToPrint = textToPrint.substr(0,m_MaxEntryLength);
+		/*if( m_lastTexts.size() + 1 > m_maxTexts )
+			m_lastTexts.erase( m_lastTexts.begin() );*/
 
-		if( m_LastTexts.size() + 1 > m_MaxTexts )
-			m_LastTexts.erase( m_LastTexts.begin() );
-
-		m_LastTexts.push_back(textToPrint);
+		m_lastTexts.push_back(textToPrint);
 		
 		onAddText(textToPrint);
 	}
@@ -131,116 +123,114 @@ namespace gcore
 
 	void Console::executeEntry()
 	{
+		moveCursorToBegin(); // reset cursor
+		m_entryHistoryCursorPos = 0; // reset entry history cursor
+
 		//do nothing if the entry is empty :
-		if(m_Entry.empty())return;
+		boost::algorithm::trim( m_entry );
+		if(m_entry.empty())return;
 
 		//store the entry and move the older entry if not enough place:
-		if( m_LastEntries.size() + 1 > m_MaxEntries )
-			m_LastEntries.erase( m_LastEntries.begin() );
+		/*if( m_lastEntries.size() + 1 > m_maxEntries )
+			m_lastEntries.erase( m_lastEntries.begin() );*/
 
-		m_LastEntries.push_back(m_Entry);
+		m_lastEntries.push_back(m_entry);
 
-		//is it a command?
-		bool isCommand = false;
-		unsigned int idPrefix ;
-		for(idPrefix = 0; idPrefix< m_CommandPrefixList.size(); ++idPrefix)
+		if( m_activeCommand.get() != nullptr )
 		{
-			if( m_Entry.substr( 0, m_CommandPrefixList[idPrefix].length() ) == m_CommandPrefixList[idPrefix] )
-			{
-				isCommand = true;
-				break;
-			}
+			// there is already an active command : just send it the parameters!
+			parseParameters( m_entry, m_paramList, m_activeCommand->getParamSeparator() );
+			
+			executeActiveCommand();
 		}
-
-		if(isCommand)
+		else
 		{
-			//////////////////////////////////////////////////////////////////////////
-			//execute command :
+			const LocalizedString commandName = extractCommandCall( m_entry );
 
-			//get the command
-			size_t prefixLength = m_CommandPrefixList[idPrefix].length();
-			UTFString commandName = m_Entry.substr(prefixLength,m_Entry.find_first_of(L" ")-prefixLength);
-
-			if(commandName.empty())return;//do nothing if no command
-
-			//check that the command is registered : 
-			std::map< UTFString, ConsoleCommandPtr >::iterator it;
-			it = m_CommandList.find(commandName);
-
-			if(it!=m_CommandList.end())
+			// is there a command call?
+			if(!commandName.empty())
 			{
-				//command found!
-				//print it!
-				printText(m_Entry);
-				//get the parameters : 
-				UTFString params = m_Entry.substr(commandName.length()+prefixLength);
-				
-				parseParams(params, m_paramList,it->second->m_paramSeparators);
-				//execute the command :
-				it->second->execute((*this),m_paramList);
+				// yes! 
+				//check that the command is registered : 
+				CommandIndex::iterator it;
+				it = m_commandIndex.find(commandName);
 
-			}
-			else
+				if(it!=m_commandIndex.end())
+				{
+					//command found!
+					m_activeCommand = it->second;
+
+					//print the entry!
+					if( m_printCommandOnExecute ) printEntry();
+
+					//get the parameters : 
+					const LocalizedString params = m_entry.substr( commandName.length() + m_commandCallPrefix.length() );
+					parseParameters( params, m_paramList, m_activeCommand->getParamSeparator() );
+
+					// then execute it!
+					executeActiveCommand();
+
+				}
+				else
+				{
+					//command not found!
+					printText( L"'" + commandName + L"' command unknown.");
+
+				}
+
+			}else
 			{
-				//command not found!
-				printText( L"'" + commandName + L"' command unknown.");
+				//execute default command with the entry as parameter if defined:
+				if(m_defaultCommand)
+				{
+					parseParameters( m_entry, m_paramList, m_defaultCommand->getParamSeparator() );
+					m_defaultCommand->execute((*this),m_paramList);
 
-			}
-
-		}else
-		{
-			//execute default command with the entry as parameter if defined:
-			if(m_DefaultCommand)
-			{
-				
-				parseParams(m_Entry, m_paramList, m_DefaultCommand->m_paramSeparators);
-
-				m_DefaultCommand->execute((*this),m_paramList);
-
-			}
-			else
-			{
-				//no default command : we just print the entry
-				printText(m_Entry);
+				}
+				else
+				{
+					//no default command : we just print the entry
+					printEntry();
+				}
 			}
 		}
 
 		//reset the entry : 
-		m_Entry.clear();
-		onEntryChanged();
-
+		m_entry.clear();
+		onEntryChanged(); // notify
 	}
 
-	void Console::addCommand(const UTFString& name,ConsoleCommandPtr& command )
+	void Console::addCommand( const ConsoleCommandPtr& command )
 	{
-		GC_ASSERT( !name.empty(), "Tried to add an unnamed ConsoleCommand!" );
+		GC_ASSERT( !command->getName().empty(), "Tried to add an unnamed ConsoleCommand!" );
 		GC_ASSERT( &command != nullptr && command.get() != nullptr , "Tried to add a null ConsoleCommand!");
-		m_CommandList[name]= command;
+		m_commandIndex[ command->getName() ] = command;
 	}
 
-	void Console::removeCommand(const UTFString& name)
+	void Console::removeCommand(const LocalizedString& name)
 	{
 		GC_ASSERT( !name.empty(), "Tried to remove an unnamed ConsoleCommand!" );
+		GC_ASSERT( name != ConsoleCmd_Help::HELP_COMMAND_NAME, "Tried to remove the help command!" );
 
-		std::map<UTFString, ConsoleCommandPtr >::iterator it;
-		it=m_CommandList.find(name);
-		if(it!=m_CommandList.end())
+		CommandIndex::iterator it;
+		it=m_commandIndex.find(name);
+		if(it!=m_commandIndex.end())
 		{
-			m_CommandList.erase(it);
+			m_commandIndex.erase(it);
 			return;
 		}
 		
 		// command not found!
 	}
 
-	ConsoleCommandPtr Console::getCommand(const UTFString& name)
+	ConsoleCommandPtr Console::getCommand(const LocalizedString& name)
 	{
 		GC_ASSERT( !name.empty(), "Tried to get an unnamed ConsoleCommand!" );
 
-		std::map<UTFString, ConsoleCommandPtr >::iterator it;
-		it = m_CommandList.find(name);
+		CommandIndex::iterator it;
+		it = m_commandIndex.find(name);
 
-		if(it!=m_CommandList.end())
+		if(it!=m_commandIndex.end())
 		{
 			return it->second;
 		}
@@ -248,91 +238,199 @@ namespace gcore
 		return ConsoleCommandPtr();
 	}
 
-	void Console::setDefaultCommand(const UTFString& name)
+	void Console::setDefaultCommand(const LocalizedString& name)
 	{
 		//just set nullptr if the name is empty
 		if(name.empty())
 		{
-			m_DefaultCommand.reset();
+			m_defaultCommand.reset();
 			return;
 		}
 
-		std::map<UTFString, ConsoleCommandPtr >::iterator it;
-		it=m_CommandList.find(name);
-		if(it!=m_CommandList.end())
+		CommandIndex::iterator it;
+		it=m_commandIndex.find(name);
+		if(it!=m_commandIndex.end())
 		{
-			m_DefaultCommand = it->second;
+			m_defaultCommand = it->second;
 		}
 	}
-
-	void Console::addCommandPrefix(const UTFString& prefix)
+	
+	void Console::setCommandCallPrefix( const LocalizedString& commandCallPrefix )
 	{
-		GC_ASSERT( !prefix.empty(), "Tried to add an empty command prefix!" );
-		m_CommandPrefixList.push_back(prefix);
+		m_commandCallPrefix = boost::algorithm::trim_copy( commandCallPrefix );
+		
+		GC_ASSERT( !m_commandCallPrefix.empty(), "Tried to set an empty command call prefix!" );
 	}
 
-	void Console::removeCommandPrefix(const UTFString& prefix)
+	void Console::setEntry( const LocalizedString& entry )
 	{
-		GC_ASSERT( !prefix.empty(), "Tried to remove an empty command prefix!" );
+		m_entry = entry;
+		
+		if(m_entry.length()>m_maxEntryLength)m_entry = m_entry.substr(0,m_maxEntryLength);
 
-		std::vector< UTFString >::iterator it;
-		it = std::find(m_CommandPrefixList.begin(),m_CommandPrefixList.end(),prefix);
-		if(it != m_CommandPrefixList.end())
-		{
-			m_CommandPrefixList.erase(it);
-		}
-
-	}
-
-	void Console::setEntry( const UTFString& entry )
-	{
-		m_Entry = entry;
-		if(m_Entry.length()>m_MaxEntryLength)m_Entry = m_Entry.substr(0,m_MaxEntryLength);
+		moveCursorToEnd(); 
 		onEntryChanged();
 	}
 
-/*
-	void Console::setMaxEntries(unsigned int val)
+	LocalizedString Console::extractCommandCall( const LocalizedString& entry ) const
 	{
-		m_MaxEntries = val;
+		const LocalizedString trimmedEntry = boost::algorithm::trim_copy( entry );
+		if(trimmedEntry.empty()) return L""; // be lazy!
+		
+		// is there a command call?
+		if( boost::algorithm::starts_with( trimmedEntry , m_commandCallPrefix ) ) 
+		{
+			// command call found!
+			const size_t prefixLength = m_commandCallPrefix.length();
+			const LocalizedString commandName = m_entry.substr( prefixLength, m_entry.find_first_of(L" ") - prefixLength);
 
-		if(m_LastEntries.size() < val) m_LastEntries.resize(val);
-
-		optimizeMemory();
-
+			return commandName;
+		}
+		else return L"";
 	}
 
-	void Console::setMaxTexts(unsigned int val)
+	void Console::executeActiveCommand()
 	{
-		m_MaxTexts = val;
+		GC_ASSERT( m_activeCommand.get() != nullptr, "Tried to call a null active command!" );
 
-		if(m_LastTexts.size() < val) m_LastTexts.resize(val);
+		//execute the command :
+		const bool keepActive = m_activeCommand->execute((*this),m_paramList);
 
-		optimizeMemory();
+		if( !keepActive )
+		{
+			// no more active command
+			m_activeCommand.reset(); 
+		}
 	}
 
-	void Console::setMaxEntryLength(unsigned int val)
+	void Console::printEntry()
 	{
-		m_MaxEntryLength = val;
+		if(m_entry.empty()) return; // be lazy!
 
-		optimizeMemory();
+		onEntryPrint(); // notify
+		printText(m_entry); // display
 	}
 
-	
-	void Console::optimizeMemory()
+	bool Console::setCursorPosition( unsigned long cursorPos )
 	{
-		// cut the entry if too long
-		if(m_Entry.length()>m_MaxEntryLength)m_Entry = m_Entry.substr(0,m_MaxEntryLength);
+		bool rightMove = false;
 
-		// reserve entry memory
-		m_Entry.reserve( sizeof(UTF_CHAR) * m_MaxEntryLength );
+		if( m_entry.empty() )
+		{
+			m_cursorPos = 0;
+		}
+		else if( cursorPos <= m_entry.size() )
+		{
+			m_cursorPos = cursorPos;
+			rightMove = true;
+		}
+		else
+		{
+			// out of entry bound!
+			moveCursorToEnd();
+		}
 
-		// reserve memory for last entries 
-		m_LastEntries.reserve( m_MaxEntries );
+		onCursorMoved();
 
-		// reserve memory for last texts
-		m_LastTexts.reserve( m_MaxTexts );
-
+		return rightMove;
 	}
-*/
+
+	unsigned long Console::moveCursor( unsigned long steps, bool toTheright )
+	{
+		if( m_entry.empty() )
+		{
+			setCursorPosition( 0 );
+			return 0;
+		}
+
+		const int stepUnit = toTheright ? 1 : -1;
+		const long wantedCursorPos = long(m_cursorPos) + ( steps * stepUnit );
+		
+		if( wantedCursorPos < 0 )
+		{
+			// we want to move before the first character...
+			const unsigned long oldPos = m_cursorPos;
+			moveCursorToBegin();
+			return oldPos  ; // we moved from the old cursor position to the beginning of the entry
+		}	
+		else if( wantedCursorPos < static_cast< long >( m_entry.length() ) )
+		{
+			// the new position is right
+			const unsigned long finalMove = std::abs( static_cast<long>(m_cursorPos - wantedCursorPos) );
+			setCursorPosition( wantedCursorPos );
+			return finalMove;
+		}
+		else
+		{
+			// we want to move after the last character...
+			const unsigned long oldPos = m_cursorPos;
+			moveCursorToEnd();
+			return static_cast<unsigned long>( m_entry.length() - oldPos); // we moved from the old cursor position to the end of the entry
+		}
+		
+	}
+
+	void Console::moveCursorToEnd()
+	{
+		setCursorPosition( static_cast<unsigned long>( m_entry.size() ) );
+	}
+
+	void Console::moveCursorToBegin()
+	{
+		setCursorPosition( 0 );
+	}
+
+	unsigned long Console::removeEntryKeys( unsigned long keyCount, bool onTheLeft )
+	{
+		if( m_entry.empty() || keyCount == 0 )
+		{
+			return 0;
+		}
+
+		const std::size_t previousLength = m_entry.length();
+
+		if( onTheLeft )
+		{
+			if( m_cursorPos > 0 )
+			{
+				const unsigned long oldPos = m_cursorPos;
+				moveCursor( keyCount, false );
+
+				m_entry.erase( oldPos - 1, keyCount );
+				
+			}
+		}
+		else
+		{
+			if( m_cursorPos < m_entry.length() )
+			{
+				const unsigned long oldPos = m_cursorPos;
+				
+				moveCursor( keyCount - 1, true );
+				m_entry.erase( oldPos + 1 - keyCount, keyCount );
+				
+			}
+
+		}
+
+		const std::size_t currentLength = m_entry.length();
+		const std::size_t removedCharCount = previousLength - currentLength;
+
+		return static_cast< unsigned long >( removedCharCount );
+	}
+
+	void Console::moveEntryHistoryCursor( unsigned long steps /*= 1*/, bool toPast /*= true */ )
+	{
+		if(m_lastEntries.empty()) return; // be lazy!
+
+		const long stepUnit = toPast ? 1 : -1;
+		const long wantedEntryIdx = (static_cast<long>(m_entryHistoryCursorPos) - 1) + (static_cast<long>(steps) * stepUnit);
+
+		if( wantedEntryIdx >= 0 && static_cast<std::size_t>( wantedEntryIdx ) < m_lastEntries.size() ) 
+		{
+			m_entryHistoryCursorPos += (steps * stepUnit);
+			setEntry( m_lastEntries[ m_lastEntries.size() - 1 - wantedEntryIdx  ] );
+		}
+	}
+
 }

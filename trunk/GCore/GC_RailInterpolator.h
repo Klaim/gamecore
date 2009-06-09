@@ -19,18 +19,18 @@ namespace gcore
 		, typename RailType
 		, typename SpaceUnitType = float 
 		, class RelationType = float >
-	class RailAutoMove
-		: public automove::RelativityControl_Speed< StateType, SpaceUnitType >
-		, public automove::TrajectoryControl_Path< StateType, RailType, SpaceUnitType, RelationType >
+	class RailInterpolator
+		: public interpolation::RelativityControl_Speed< StateType, SpaceUnitType >
+		, public interpolation::TrajectoryControl_Path< StateType, RailType, SpaceUnitType, RelationType >
 	{
 	public:
 
-		RailAutoMove( Clock* clock = nullptr)
+		explicit RailInterpolator( Clock* clock = nullptr)
 			: RelativityControl_Speed( clock )
 			, TrajectoryControl_Path()
 		{}
 
-		RailAutoMove( const StateType& state, Clock* clock = nullptr ) 
+		RailInterpolator( const StateType& state, Clock* clock = nullptr ) 
 			: RelativityControl_Speed( state, clock )
 			, TrajectoryControl_Path( state )
 		{

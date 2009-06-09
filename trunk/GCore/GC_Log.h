@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-
+#include <sstream>
 #include "GC_Common.h"
 #include "GC_String.h"
 
@@ -74,7 +74,6 @@ namespace gcore
 
 		void registerListener( LogListener* logListener );
 		void unregisterListener( LogListener* logListener );
-
 		
 	private:
 
@@ -111,6 +110,7 @@ namespace gcore
 					
 	};
 
+	
 }
 
 #endif

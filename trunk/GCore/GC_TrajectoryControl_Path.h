@@ -4,16 +4,16 @@
 
 #include "GC_Common.h"
 #include "GC_Curve.h"
-#include "GC_AutoMove.h"
+#include "GC_Interpolator.h"
 
 namespace gcore
 {
-namespace automove
+namespace interpolation
 {
 	/** No documentation yet.
 	*/
 	template < typename StateType, typename PathType, typename SpaceUnitType , typename RelationType = float >
-	class TrajectoryControl_Path : virtual public AutoMove< StateType, SpaceUnitType >
+	class TrajectoryControl_Path : virtual public Interpolator< StateType, SpaceUnitType >
 	{
 	public:
 
@@ -28,7 +28,7 @@ namespace automove
 		}
 
 		TrajectoryControl_Path( const StateType& state )
-			: AutoMove( state )
+			: Interpolator( state )
 			, m_startState( 0 )
 			, m_finalState( 1 )
 			, m_currentState( 0 )

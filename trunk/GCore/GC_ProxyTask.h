@@ -53,11 +53,11 @@ namespace gcore
 		
 	private:
 	
-		TaskFunction m_executeFunction;
-		TaskFunction m_onActivateFunction;
-		TaskFunction m_onTerminateFunction;
-		TaskFunction m_onPausedFunction;
-		TaskFunction m_onResumedFunction;
+		const TaskFunction m_executeFunction;
+		const TaskFunction m_onActivateFunction;
+		const TaskFunction m_onTerminateFunction;
+		const TaskFunction m_onPausedFunction;
+		const TaskFunction m_onResumedFunction;
 
 	};
 	

@@ -15,17 +15,17 @@ namespace gcore
 			using namespace boost::gregorian;
 			ptime now = second_clock::local_time(); //use the clock
 
-			String finalMsg("");
-			finalMsg += "[" + to_simple_string( now.time_of_day() ) + "] ";
+			std::stringstream finalMsg;
+			finalMsg << "[" << to_simple_string( now.time_of_day() ) << "] ";
 
-			finalMsg += message;
+			finalMsg << message;
 
 			//display in console if any:
-			std::cout << "[" << m_name << "]" << finalMsg << std::endl; 
+			std::cout << "[" << m_name << "]" << finalMsg.str() << std::endl; 
 			std::cout.flush();
 
 			//write in file :
-			m_fileStream << finalMsg << std::endl;
+			m_fileStream << finalMsg.str() << std::endl;
 			m_fileStream.flush();
 
 			// notify each listener registered to this log
@@ -92,4 +92,5 @@ namespace gcore
 		m_registeredListeners.erase( std::remove( m_registeredListeners.begin(), m_registeredListeners.end(), logListener ), m_registeredListeners.end() );
 
 	}
+
 }

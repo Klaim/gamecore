@@ -3,6 +3,7 @@
 
 namespace gcore
 {
+
 	PhaseManager::PhaseManager()
 	{
 
@@ -10,92 +11,125 @@ namespace gcore
 
 	PhaseManager::~PhaseManager()
 	{
-
+		unregisterAllPhases();
 	}
 
 	void PhaseManager::registerPhase( const PhasePtr& phase )
 	{
 		GC_ASSERT( phase.get() != nullptr, "Tried to register a null phase!" );
-		GC_ASSERT( getRegisteredPhase( phase->getName() ).get() == nullptr, String( "Tried to register an already registered Phase! Phase Name : " ) + phase->getName() );
+		GC_ASSERT( findPhase( phase->getName() ).get() == nullptr, String( "Tried to register an already registered Phase! Phase Name : " ) + phase->getName() );
 		
+		// register
 		m_phaseIndex[ phase->getName() ] = phase;
-
-	}
-
-	void PhaseManager::unregisterPhase( const String& phaseName )
-	{
-		std::map< String , PhasePtr >::iterator it = m_phaseIndex.find( phaseName );
-		GC_ASSERT( it != m_phaseIndex.end(), "Tried to unregister a non registered Phase!" );
-
-		m_phaseIndex.erase( it );
-	}
-
-	void PhaseManager::requestLoadPhase( const String& phaseName )
-	{
-		PhasePtr phase = getRegisteredPhase( phaseName );
+		phase->m_phaseManager = this;
 		
-		if( phase.get() != nullptr )
+		// notify
+		//phase->onRegistered(); // obsolete
+
+	}
+
+	void PhaseManager::unregisterPhase( const PhasePtr& phase )
+	{
+		GC_ASSERT( phase.get() != nullptr , "Tried to unregister a phase not registered!");
+
+		// notify
+		// phase->onUnregister(); // obsolete
+
+		if( phase->getState() != Phase::UNLOADED )
+		{
+			// the phase have to be unloaded!
+			// try to unload it now...
+
+			if( phase->getState() == Phase::ACTIVE )
+			{
+				requestTerminatePhase( phase );
+			}
+
+			if( phase->getState() == Phase::LOADED )
+			{
+				requestUnloadPhase( phase );
+			}
+			
+			GC_ASSERT( phase->getState() == Phase::UNLOADED, String( "Tried to unregister phase " ) + phase->getName() + String(" but is not unloaded!") );
+		}
+
+		// unregister
+		phase->m_phaseManager = nullptr;
+		m_phaseIndex.erase( phase->getName() );
+	}
+
+	void PhaseManager::requestLoadPhase( const PhasePtr& phase )
+	{
+		GC_ASSERT( phase.get() != nullptr, "Requested to load a null phase..." );
+
+		if( phase->isManaged() && phase->m_phaseManager == this )
 		{
 			phase->requestLoad();
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request load to a non registered Phase! Name requested : ") + phaseName );
+			GC_EXCEPTION( String("Tried to request load to a non registered Phase! Name requested : ") + phase->getName() );
 		}
 
 	}
 
-	void PhaseManager::requestUnloadPhase( const String& phaseName )
+	void PhaseManager::requestUnloadPhase( const PhasePtr& phase )
 	{
-		PhasePtr phase = getRegisteredPhase( phaseName );
+		GC_ASSERT( phase.get() != nullptr, "Requested to unload a null phase..." );
 
-		if( phase.get() != nullptr )
+		if( phase->isManaged() && phase->m_phaseManager == this )
 		{
 			phase->requestUnload();
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request unload to a non registered Phase! Name requested : ") + phaseName );
+			GC_EXCEPTION( String("Tried to request unload to a non registered Phase! Name requested : ") + phase->getName() );
 		}
 
 	}
 
-	void PhaseManager::requestActivatePhase( const String& phaseName )
+	void PhaseManager::requestActivatePhase( const PhasePtr& phase )
 	{
-		PhasePtr phase = getRegisteredPhase( phaseName );
+		GC_ASSERT( phase.get() != nullptr, "Requested to activate a null phase..." );
 
-		if( phase.get() != nullptr )
+		if( phase->isManaged() && phase->m_phaseManager == this )
 		{
 			phase->requestActivate();
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request activation to a non registered Phase! Name requested : ") + phaseName );
+			GC_EXCEPTION( String("Tried to request activation to a non registered Phase! Name requested : ") + phase->getName() );
 		}
 
 	}
 
-	void PhaseManager::requestTerminatePhase( const String& phaseName )
+	void PhaseManager::requestTerminatePhase( const PhasePtr& phase )
 	{
-		PhasePtr phase = getRegisteredPhase( phaseName );
+		GC_ASSERT( phase.get() != nullptr, "Requested to terminate a null phase..." );
 
-		if( phase.get() != nullptr )
+		if( phase->isManaged() && phase->m_phaseManager == this )
 		{
 			phase->requestTerminate();
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request termination to a non registered Phase! Name requested : ") + phaseName );
+			GC_EXCEPTION( String("Tried to request termination to a non registered Phase! Name requested : ") + phase->getName() );
 		}
 
 	}
 
 	void PhaseManager::unregisterAllPhases()
 	{
-		m_phaseIndex.clear();
+		// we use this heavy algorithm to make sure the the phases that unregister other phases will be fine.
+		while( m_phaseIndex.begin() != m_phaseIndex.end() )
+		{
+			const String phaseName = m_phaseIndex.begin()->first;
+			unregisterPhase( phaseName );
+		}
 	}
 
-	PhasePtr PhaseManager::getRegisteredPhase( const String& phaseName )
+
+	PhasePtr PhaseManager::findPhase( const String& phaseName )
 	{
 		std::map< String , PhasePtr >::iterator it = m_phaseIndex.find( phaseName );
 
@@ -107,6 +141,18 @@ namespace gcore
 		{
 			return PhasePtr();
 		}
+	}
+
+	gcore::PhasePtr PhaseManager::findRegisteredPhase( const String& phaseName )
+	{
+		const PhasePtr phase = findPhase( phaseName );
+
+		if( phase.get() == nullptr )
+		{
+			GC_EXCEPTION( String( "Phase \"" ) + phaseName + String("\" not found in phase manager!") );
+		}
+
+		return phase;
 	}
 
 	std::vector< String > PhaseManager::getRegisteredPhaseNames() const
@@ -124,4 +170,5 @@ namespace gcore
 
 		return resultList;
 	}
+
 }

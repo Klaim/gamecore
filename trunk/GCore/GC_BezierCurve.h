@@ -4,6 +4,7 @@
 
 #include "GC_Common.h"
 #include "GC_Curve.h"
+#include "GC_SpaceStateUtil.h"
 
 namespace gcore
 {
@@ -14,6 +15,7 @@ namespace gcore
 		
 		BezierCurve()
 			: m_length( -1 )
+			, m_lengthPrecision( 0 )
 		{}
 
 		BezierCurve( const StateType& beginPoint, const StateType& endPoint ) 
@@ -23,20 +25,20 @@ namespace gcore
 
 		virtual ~BezierCurve(){}
 
-		SpaceUnitType length() const 
+		SpaceUnitType length( const unsigned long precision = 100 ) const 
 		{
-			if( m_length == -1 )
+			if( m_length == -1 || m_lengthPrecision < precision )
 			{
-				const_cast< BezierCurve* >( this )->calculateLength();
+				const_cast< BezierCurve* >( this )->calculateLength( precision );
 			}
 			GC_ASSERT( m_length >= 0 , "Bezier curve with negative length!" );
 			return m_length;
 		}
 
 		/** Calculate the length of ONE period of this Bezier curve, using approximation.
-			@param lengthPrecition Number of segments of the curve used to calculate the length aproximation.
+			@param precision Number of segments of the curve used to calculate the length aproximation.
 		*/
-		void calculateLength( unsigned int lengthPrecision = 100 );
+		void calculateLength(const unsigned long precision);
 
 	protected:
 
@@ -45,7 +47,7 @@ namespace gcore
 	private:
 
 		SpaceUnitType m_length;
-
+		unsigned long m_lengthPrecision;
 	};
 	
 	/** Quadratic Bezier curve representation.
@@ -160,7 +162,7 @@ namespace gcore
 
 
 	template < typename StateType , typename SpaceUnitType, typename RelationType >
-	void gcore::BezierCurve<StateType, SpaceUnitType, RelationType>::calculateLength( unsigned int lengthPrecision /*= 100 */ )
+	void gcore::BezierCurve<StateType, SpaceUnitType, RelationType>::calculateLength( const unsigned long lengthPrecision /*= 100 */ )
 	{
 		GC_ASSERT( lengthPrecision > 0, "Tried to calculate length of Bezier curve by subdividing it in 0 segments!" );
 
@@ -177,7 +179,7 @@ namespace gcore
 		SpaceUnitType resultLength = 0;
 		const RelationType segmentPart = 1 / static_cast<RelationType>( lengthPrecision );
 
-		for( unsigned int k = 0; k < lengthPrecision; ++k )
+		for( unsigned long k = 0; k < lengthPrecision; ++k )
 		{
 			const RelationType segmentStart = k * segmentPart;
 			const RelationType segmentEnd = (k + 1) * segmentPart;
@@ -193,6 +195,7 @@ namespace gcore
 
 		// store the final result
 		m_length = resultLength;
+		m_lengthPrecision = lengthPrecision;
 	}
 
 }

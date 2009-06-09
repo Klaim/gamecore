@@ -8,7 +8,7 @@
 
 // Target platforms :
 #define GC_PLATFORM_WIN32	1		///< Win32 Architecture (Windows98, WindowsXP, Vista)
-#define GC_PLATFORM_APPLE	2		///< Apple OS (OSX)
+#define GC_PLATFORM_MACOSX	2		///< Apple OS (OSX)
 #define	GC_PLATFORM_LINUX	3		///< Linux based OS (various, Ubuntu and Fedora as first target?)
 
 // Find wich platform it is.
@@ -19,8 +19,8 @@
 
 #elif defined( __APPLE_CC__)
 
-	/// We are on an APPLE operating system (OSX)
-	#define GC_PLATFORM		GC_PLATFORM_APPLE
+	/// We are on an APPLE operating system (MacOSX)
+	#define GC_PLATFORM		GC_PLATFORM_MACOSX
 
 #else 
 	
@@ -69,7 +69,27 @@
 
 
 /************************************/
-   
+// Unicode character types: 
+#if GC_PLATFORM == GC_PLATFORM_WIN32
 
+// remove this once c++0x is here...
+#if _MSC_VER < 1600
+	typedef wchar_t				char16_t;	///< UTF-16 encoded character.
+	typedef unsigned int		char32_t;	///< UTF-32 encoded character.
+#endif
+
+#elif GC_PLATFORM == GC_PLATFORM_MACOSX
+
+#error Define types for Apple MacOSX platform!
+//typedef unsigned short		char16_t;	///< UTF-16 encoded character.
+//typedef unsigned int		char32_t;	///< UTF-32 encoded character.
+
+#elif GC_PLATFORM == GC_PLATFORM_LINUX
+
+#error Define types for Linux platform!
+//typedef unsigned short		char16_t;	///< UTF-16 encoded character.
+//typedef unsigned int		char32_t;	///< UTF-32 encoded character.
+
+#endif
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef GCORE_EVENTTASK_H
-#define GCORE_EVENTTASK_H
+#ifndef GCORE_TASK_EVENTPROCESS_H
+#define GCORE_TASK_EVENTPROCESS_H
 #pragma once
 
 #include "GC_Common.h"
@@ -16,17 +16,17 @@ namespace gcore
 		@see EventManager
 		
 	*/
-	class GCORE_API EventTask  : public Task
+	class GCORE_API Task_EventProcess  : public Task
 	{
 	public:
 		/** Constructor.
 			@param eventManager EventManager that this Task will update.
 		*/
-		EventTask(EventManager& eventManager, TaskPriority priority = 0 ,const String& name = "" );
+		Task_EventProcess(EventManager& eventManager, TaskPriority priority = 0 ,const String& name = "" );
 
 		/** Destruction.
 		*/
-		~EventTask();
+		~Task_EventProcess();
 
 
 		EventManager& getEventManager() { return m_eventManager; }
