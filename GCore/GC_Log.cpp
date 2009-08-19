@@ -6,52 +6,17 @@
 
 namespace gcore
 {
-	//add a new message to the log
-	void Log::logMessage( const String& message, LogMessageLevel level )
+	void Log::logMessage( const String& message )
 	{
-		if( level + m_logLevel >= GC_LOG_THRESHOLD )
-		{
-			using namespace boost::posix_time;
-			using namespace boost::gregorian;
-			ptime now = second_clock::local_time(); //use the clock
-
-			std::stringstream finalMsg;
-			finalMsg << "[" << to_simple_string( now.time_of_day() ) << "] ";
-
-			finalMsg << message;
-
-			//display in console if any:
-			std::cout << "[" << m_name << "]" << finalMsg.str() << std::endl; 
-			std::cout.flush();
-
-			//write in file :
-			m_fileStream << finalMsg.str() << std::endl;
-			m_fileStream.flush();
-
-			// notify each listener registered to this log
-			if( !m_registeredListeners.empty() ) // be lazy!
-			{
-				// Note : to manage the case when a listener manipulate our
-				// current listener list, we make a copy first of the list and
-				// notify the listeners in the copy list.
-
-				const std::vector< LogListener* > notificationList( m_registeredListeners );
-				const std::size_t listenerCount = notificationList.size();
-				for ( std::size_t i = 0; i < listenerCount; ++ i )
-				{
-					GC_ASSERT( notificationList[i] != nullptr, String( "Found a null listener registered in log " ) + m_name );
-					notificationList[i]->catchLogMessage( *this , message, level );
-				}
-			}
-		}
-
+		logText(); // to be sure we flush the current text if any (when "composing" a message)
+		addText( message ); 
+		logText(); // really log the message
 	}
 
 	//only LogManager should create a log
-	Log::Log( const LogManager& logManager, const String& name, LoggingLevel level, bool isNewFile ):
-		m_logLevel(level),
-		m_logManager(logManager),
-		m_name(name)
+	Log::Log( const LogManager& logManager, const String& name, bool isNewFile )
+		: m_logManager(logManager)
+		, m_name(name)
 	{
 		if(isNewFile)
 		{
@@ -92,5 +57,62 @@ namespace gcore
 		m_registeredListeners.erase( std::remove( m_registeredListeners.begin(), m_registeredListeners.end(), logListener ), m_registeredListeners.end() );
 
 	}
+
+	void Log::addText( const String& text )
+	{
+		m_message << text;
+	}
+
+	void Log::logText()
+	{
+		const String& message = m_message.str();
+
+		if( message.empty() ) return; // be lazy
+
+		// be ready for the next message
+		m_message.str( "" );
+
+		// now we can log:
+
+		using namespace boost::posix_time;
+		using namespace boost::gregorian;
+		ptime now = second_clock::local_time(); //use the clock
+
+		std::stringstream finalMsgStream;
+		finalMsgStream << "[" << to_simple_string( now.time_of_day() ) << "] " << message;
+		const String& finalMsg = finalMsgStream.str();
+
+		//display in console if any:
+		std::cerr << "[" << m_name << "]" << finalMsg << std::endl; 
+		std::cerr.flush();
+		std::cout << "[" << m_name << "]" << finalMsg << std::endl; 
+		std::cout.flush();
+
+		//write in file :
+		m_fileStream << finalMsg << std::endl;
+		m_fileStream.flush();
+
+		// notify each listener registered to this log
+		if( !m_registeredListeners.empty() ) // be lazy!
+		{
+			// Note : to manage the case when a listener manipulate our
+			// current listener list, we make a copy first of the list and
+			// notify the listeners in the copy list.
+
+			const std::vector< LogListener* > notificationList( m_registeredListeners );
+			const std::size_t listenerCount = notificationList.size();
+			for ( std::size_t i = 0; i < listenerCount; ++ i )
+			{
+				GC_ASSERT( notificationList[i] != nullptr, String( "Found a null listener registered in log " ) + m_name );
+				notificationList[i]->catchLogMessage( *this , message );
+			}
+		}
+	}
+
+	LogStreamer operator<<( Log& log, const String& message )
+	{
+		return LogStreamer( log, message );
+	}
+
 
 }

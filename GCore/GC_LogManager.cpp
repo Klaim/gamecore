@@ -74,7 +74,7 @@ namespace gcore
 	}
 
 	//Create a new Log
-	Log* LogManager::createLog(const String& name,LoggingLevel level,bool isNewFile)
+	Log* LogManager::createLog(const String& name,bool isNewFile)
 	{
 
 		if(m_logList.find(name)!=m_logList.end())
@@ -83,7 +83,7 @@ namespace gcore
 			GC_EXCEPTION("Tried to create a log already created!!!");
 		}
 
-		Log* log = new Log( *this, name, level, isNewFile );
+		Log* log = new Log( *this, name, isNewFile );
 		m_logList[name]=log;
 
 		return log;
@@ -113,14 +113,14 @@ namespace gcore
 	}
 
 	//Write a message to the Log
-	void LogManager::logMessage( const String& logName, const String& message, LogMessageLevel level )
+	void LogManager::logMessage( const String& logName, const String& message )
 	{
 		//Find the logIt to let it handle the message
 		LogMap::iterator logIt = m_logList.find( logName );
 		if( logIt != m_logList.end() )
 		{
 			GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
-			logIt->second->logMessage( message, level );
+			logIt->second->logMessage( message );
 		}
 #ifdef GC_DEBUG
 		else
@@ -130,9 +130,9 @@ namespace gcore
 #endif
 	}
 
-	void LogManager::logMessage( const String& message, LogMessageLevel level )
+	void LogManager::logMessage( const String& message)
 	{
-		m_defaultLog->logMessage( message, level );
+		m_defaultLog->logMessage( message );
 	}
 
 
@@ -153,11 +153,9 @@ namespace gcore
 	LogManager::LogManager(const String& defaultLogName)
 	{
 		//We create a system logIt that is set as the default logIt : 
-#ifdef GC_DEBUG
-		m_defaultLog = createLog(defaultLogName,LL_BOREME,true);
-#else
-		m_defaultLog = createLog(defaultLogName,LL_NORMAL,true);
-#endif
+
+		m_defaultLog = createLog( defaultLogName, true );
+
 		m_defaultLog->logMessage("LogManager initialized.");
 
 	}

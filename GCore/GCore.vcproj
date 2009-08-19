@@ -516,6 +516,10 @@
 				>
 			</File>
 		</Filter>
+		<Filter
+			Name="Id"
+			>
+		</Filter>
 		<File
 			RelativePath=".\GC_Common.h"
 			>

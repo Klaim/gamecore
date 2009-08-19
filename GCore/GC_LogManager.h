@@ -61,11 +61,10 @@ namespace gcore
 			the LogManager handles the notifying of LogListener when the logMessage of the Log is called through the LogManager.
 			THe Log is deleted when the LogManager is deleted.
 			@param name The name of the Log (also the name of the file in which the Log will write).
-			@param level The importance of the message.
 			@param isNewFile True for erasing the log file if it already exists, else append the messages at the end of the existing file.
 			@return The created Log
 		**/
-		Log* createLog( const String& name, LoggingLevel level=LL_NORMAL, bool isNewFile = true );
+		Log* createLog( const String& name, bool isNewFile = true );
 
 		/** TODO : add some comments here!   
 		*/
@@ -80,16 +79,14 @@ namespace gcore
 		/** Make a Log write a message, and notify every registered LogListener.
 			@param logName The name of the log which has to write message, if no log with this name exist, nothing happens.
 			@param message The message to add into the file of the Log, each message is succeeded by a new line.
-			@param level The importance of the message.
 		**/
-		void logMessage( const String& logname, const String& message, LogMessageLevel level=LML_NORMAL );
+		void logMessage( const String& logname, const String& message );
 
 		/** Write a message to the default Log, and notify every registered LogListener.
 			@param logName The name of the log which has to write message, if no log with this name exist, nothing happens.
 			@param message The message to add into the file of the Log, each message is succeeded by a new line.
-			@param level The importance of the message.
 		**/
-		void logMessage( const String& message, LogMessageLevel level=LML_NORMAL );
+		void logMessage( const String& message );
 
 		/** Returns a pointer to the default log.
 		*/

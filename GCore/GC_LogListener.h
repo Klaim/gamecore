@@ -48,9 +48,8 @@ namespace gcore
 			Inherit and provide an implementation of this method for managing logMessage events.
 			@param logName The name of the Log which method logMessage has been called.
 			@param message The message the log has to write to the file.
-			@param logLevel The importance of the message.
 		**/
-		virtual void catchLogMessage(Log& log ,const String& message, LogMessageLevel logLevel)=0;
+		virtual void catchLogMessage(Log& log ,const String& message)=0;
 
 		LogListener(){};
 
@@ -64,7 +63,7 @@ namespace gcore
 	};
 
 	/// Function-like object that can catch log messages.
-	typedef std::tr1::function< void ( Log&, const String&, LogMessageLevel ) > LogListenerFunction;
+	typedef std::tr1::function< void ( Log&, const String& ) > LogListenerFunction;
 
 	/** Proxy event listener that only redirect event catches to a provided function-like object.
 		note : seems obsolete ... should be replaced by boost::signal
@@ -76,9 +75,9 @@ namespace gcore
 			: m_logListenerFunction( logListenerFunction )
 		{}
 
-		inline void catchLogMessage(Log& log ,const String& message, LogMessageLevel logLevel)
+		inline void catchLogMessage(Log& log ,const String& message)
 		{
-			m_logListenerFunction( log, message, logLevel );
+			m_logListenerFunction( log, message );
 		}
 
 	private:
