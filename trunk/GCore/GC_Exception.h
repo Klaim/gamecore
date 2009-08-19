@@ -42,7 +42,7 @@ namespace gcore
 		long getCode() const {return m_code;}
 		
 		///Copy operator
-		virtual void operator = (const Exception& exp )
+		/*virtual void operator = (const Exception& exp )
 		{
 			m_code = exp.getCode();
 			m_file = exp.getFile();
@@ -50,7 +50,7 @@ namespace gcore
 			m_line = exp.getLine();
 			m_message = exp.getMessage();
 			
-		}
+		}*/
 		
 		/** Exception constructor.
 			@param msg		Description of the error and other informations.
@@ -69,15 +69,7 @@ namespace gcore
 
 		}
 
-		/** Exception copy constructor.
-			@param other	Other Exception to copy from.
-		*/
-		explicit Exception(const Exception& other)
-		{
-			(*this) = other;
-		}
-
-		virtual ~Exception(){}
+		~Exception(){}
 
 	private:
 
@@ -140,8 +132,10 @@ namespace gcore
 /// GCore assert macro that throw a gcore::AssertException on failure in debug mode.
 #ifdef GC_DEBUG
 #define GC_ASSERT( test , msg ) if(!(test)){ \
+			const gcore::String assert_msg( msg ); \
+			const gcore::String assert_test( #test ); \
 			GC_BREAKPOINT; \
-			throw gcore::AssertionException( msg , #test , __FUNCTION__ , __FILE__ , __LINE__ ); \
+			throw gcore::AssertionException( assert_msg , assert_test , __FUNCTION__ , __FILE__ , __LINE__ ); \
 	}
 #else
 	#define GC_ASSERT(test , msg)

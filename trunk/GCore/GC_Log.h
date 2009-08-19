@@ -21,26 +21,6 @@ namespace gcore
 	class LogManager;
 	class LogListener;
 
-	/// LogMessageLevel + LoggingLevel > NRS_LOG_THRESHOLD = message logged
-	#define GC_LOG_THRESHOLD 4
-
-	/** The level of detail to which the log will go into.
-	*/
-	enum LoggingLevel
-	{
-		LL_LOW = 1,
-		LL_NORMAL = 2,
-		LL_BOREME = 3
-	};
-
-	/** The importance of a logged message.
-	*/
-	enum LogMessageLevel
-	{
-		LML_TRIVIAL = 1,
-		LML_NORMAL = 2,
-		LML_CRITICAL = 3
-	};
 
 	/** TODO : rewrite this comment!
 		The Log class act has a log file writer.
@@ -59,14 +39,25 @@ namespace gcore
 	{
 	public :
 
-		/** Write a message into the file binded to the Log.
+		/** Write a full message into the file binded to the Log.
 			@param message The message to add into the file, each message is succeeded by a new line.
-			@param level The importance of the message.
 		**/
-		void logMessage( const String& message, LogMessageLevel level = LML_NORMAL );
+		void logMessage( const String& message );
 
-		/// Sets the level of the log detail.
-		void setLogDetail(LoggingLevel logLevel){ m_logLevel = logLevel; }
+		/** Write text in the current message without logging and adding a new line.
+			@remark Use this function to add text to the message and call logText();
+			to make the message be written in the log. It will not be written until 
+			you call it.
+			@param text Text to add.
+			@see addText
+			*/
+		void addText( const String& text );
+
+		/** Log the text that have been built with addText().
+			@see addText
+		*/
+		void logText();
+
 
 		/** The name of the log, which is also the name of the file the log writes into.
 		**/
@@ -74,14 +65,16 @@ namespace gcore
 
 		void registerListener( LogListener* logListener );
 		void unregisterListener( LogListener* logListener );
+
+		class Streamer;
 		
 	private:
 
 		/// Only LogManager should create Logs.
 		friend class LogManager;
 
-		/// The importance level of the Log, a higher log level will log messages with lower importance.
-		LoggingLevel	m_logLevel;
+		/// Current message being written.
+		std::stringstream m_message;
 
 		/// The stream writing into the file.
 		std::ofstream	m_fileStream;
@@ -99,9 +92,8 @@ namespace gcore
 			@param logManager Log manager that manage this Log.
 			@param name The name of the Log, which is the name of the file in which the Log writes data.
 			@param isNewFile True for erasing the log file if it already exists, else append the messages at the end of the existing file.
-			@param level The level of the log.
 		**/
-		Log( const LogManager& logManager,const String& name, LoggingLevel level,bool isNewFile = true);
+		Log( const LogManager& logManager,const String& name, bool isNewFile = true);
 
 		/** The log destructor close the file in which data are written.
 		**/
@@ -110,7 +102,39 @@ namespace gcore
 					
 	};
 
-	
+
+	/** To allow streaming semantic on logs (used in << operator) .
+	*/
+	class LogStreamer
+	{
+	public:
+
+		LogStreamer( Log& log, const String& text )
+			: m_log( log )
+		{
+			m_log.addText( text );
+		}
+
+		~LogStreamer()
+		{
+			m_log.logText();
+		}
+
+		LogStreamer& operator<<( const String& text )
+		{
+			m_log.addText( text );
+			return *this;
+		}
+
+	private:
+
+		Log& m_log;
+
+	};
+
+	GCORE_API LogStreamer operator<<( Log& log, const String& message );
+
+
 }
 
 #endif
