@@ -23,7 +23,7 @@ namespace gcore
 		//If the application is in another state than State_Ready or State_Finished, we cannot run it!
 		if(m_state != State_Ready && m_state != State_Finished)
 		{
-			GC_EXCEPTION("Tried to run a non ready application!");
+			GC_EXCEPTION << "Tried to run a non ready application!";
 		}
 
 		//Start Initialization

@@ -79,7 +79,7 @@ namespace gcore
 
 	Timer* TimerManager::getTimer( const String& name )
 	{
-		std::map< const String, Timer* >::iterator it = m_namedTimersIndex.find(name);
+		TimerIndex::iterator it = m_namedTimersIndex.find(name);
 
 		if( it != m_namedTimersIndex.end() ) return it->second;
 		else return nullptr;

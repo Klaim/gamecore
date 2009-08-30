@@ -141,7 +141,7 @@ namespace gcore
 				std::stringstream errorMsg;
 				errorMsg << "Unknown Phase::State being translated in text! State value = " ;
 				errorMsg << phaseState;
-				GC_EXCEPTION( errorMsg.str() );
+				GC_EXCEPTION << errorMsg.str();
 			}
 		}
 

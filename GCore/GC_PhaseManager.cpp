@@ -68,7 +68,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request load to a non registered Phase! Name requested : ") + phase->getName() );
+			GC_EXCEPTION << "Tried to request load to a non registered Phase! Name requested : " << phase->getName();
 		}
 
 	}
@@ -83,7 +83,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request unload to a non registered Phase! Name requested : ") + phase->getName() );
+			GC_EXCEPTION << "Tried to request unload to a non registered Phase! Name requested : " << phase->getName();
 		}
 
 	}
@@ -98,7 +98,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request activation to a non registered Phase! Name requested : ") + phase->getName() );
+			GC_EXCEPTION << "Tried to request activation to a non registered Phase! Name requested : " << phase->getName();
 		}
 
 	}
@@ -113,7 +113,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION( String("Tried to request termination to a non registered Phase! Name requested : ") + phase->getName() );
+			GC_EXCEPTION << "Tried to request termination to a non registered Phase! Name requested : " << phase->getName();
 		}
 
 	}
@@ -131,7 +131,7 @@ namespace gcore
 
 	PhasePtr PhaseManager::findPhase( const String& phaseName )
 	{
-		std::map< String , PhasePtr >::iterator it = m_phaseIndex.find( phaseName );
+		PhaseIndex::iterator it = m_phaseIndex.find( phaseName );
 
 		if( it != m_phaseIndex.end() ) 
 		{
@@ -149,7 +149,7 @@ namespace gcore
 
 		if( phase.get() == nullptr )
 		{
-			GC_EXCEPTION( String( "Phase \"" ) + phaseName + String("\" not found in phase manager!") );
+			GC_EXCEPTION << "Phase \"" << phaseName << "\" not found in phase manager!" ;
 		}
 
 		return phase;
@@ -161,7 +161,7 @@ namespace gcore
 		std::vector< String > resultList( nameCount );
 
 		std::size_t i = 0;
-		std::map< String , PhasePtr >::const_iterator it = m_phaseIndex.begin();
+		PhaseIndex::const_iterator it = m_phaseIndex.begin();
 		for( ; it != m_phaseIndex.end(); ++it )
 		{
 			resultList[ i ] = it->first;

@@ -4,13 +4,11 @@ GCore Project
 
 TODO :
 
-- look for places where those libs have an appropriate use or boost replace:
-	- std::tr1::array -> replace arrays by that class!
-	- std::tr1::unordered_map
+
 	
 - read and update doc comments!
 - generate the doc (and correct comments) with doxyS http://www.doxys.dk/doxys_homepage/index.html
-- make Exception heritate from std::exception
+
 
 # Test projects
 - Console
@@ -47,26 +45,15 @@ TODO :
 
 
 # Console
-- put console command names as console command constructor parameter
-- "cursor" management.
-- replace listener objects by boost::signal if possible?
-- allow exclusive command mode :
-	- a command return a boolean on execution, false if it should keep the console controle
-	- a command that have the command control will automatially receive the next inputs of the console as parametters 
-		(over the default command and without taking account of command prefixes)
-	- while a command is taking control, the command line will have a prefix (">" by default) that will not be parsed
-- Template character and string container types - if possible.
-	- note : doing this may force us to template all Console - see the impact.
-- see if std::tr1::regex could replace tokenizer usage in command parametters parsing
+
+- see if std::tr1::regex could replace tokenizer usage in command parametters parsing : 
+	ask for a regex pattern and provide a default one that will just get parametters separated by a space
 
 # Event
 - Rewrite event system - see http://www.gamedev.net/reference/articles/article2459.asp
 - see if you can use boost::signal or function but don't forget that the processing time
 	may be different than the event sent time;
 
-
-# String
-- add useful string manipulation functions (see Ogre::StringUtils )
 
 # Log
 - take a look at the future boost::logging system ( http://torjo.com/log2/index.html ) - maybe better as manage multithread programming
@@ -77,6 +64,17 @@ TODO :
 ---------------------------------------------------------------------------
 --DONE SINCE 19/06/2008----------------------------------------------------
 
+- allow exclusive command mode :
+	- a command return a boolean on execution, false if it should keep the console controle
+	- a command that have the command control will automatially receive the next inputs of the console as parametters 
+		(over the default command and without taking account of command prefixes)
+	- while a command is taking control, the command line will have a prefix (">" by default) that will not be parsed
+- "cursor" management.
+- put console command names as console command constructor parameter
+- make Exception heritate from std::exception
+- look for places where those libs have an appropriate use or boost replace:
+	- std::tr1::array -> replace arrays by that class!
+	- std::tr1::unordered_map
 - dynamic interpolations (with "moving" final position)
 - Interpolator : make the constructor parametters more optionnal and ADD ACCESSORS and modifiers!! - no more parameter in constructors
 - separate speed/fixed time concept from rail/pole concept

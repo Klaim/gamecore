@@ -5,7 +5,7 @@
 
 #include "GC_String.h"
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <boost/circular_buffer.hpp>
 
 #include "GC_Common.h"
@@ -28,8 +28,8 @@ namespace gcore	//gcore context
 		Using the console :
 		@par
 		If an entry starts with "/" (default command prefix), it suggest that it is a command.
-		The name of the command should be just next "/" : "/ping" for the "ping" command.
-		When adding a new command to the console, the name of the command should not contain "/".
+		The name of the command should be just next "$" : "$ping" for the "ping" command.
+		When adding a new command to the console, the name of the command should not contain "$".
 		Other command prefix can be added or removed.
 		@par
 		If the entry start with a command prefix but no command matches, an error message will be printed.
@@ -46,10 +46,10 @@ namespace gcore	//gcore context
 		typedef boost::circular_buffer< LocalizedString > EntryList;
 		typedef boost::circular_buffer< LocalizedString > TextList;
 		typedef std::vector< LocalizedString > ParameterList;
-		typedef std::map< const LocalizedString , ConsoleCommandPtr > CommandIndex;
+		typedef std::tr1::unordered_map< LocalizedString , ConsoleCommandPtr > CommandIndex;
 
 
-		// default prefix (L"/"), set on console construction.
+		// default prefix (L"$"), set on console construction.
 		static const LocalizedString DEFAULT_PREFIX;
 		
 		//////////////////////////////////////////////////////////////////////////
@@ -119,7 +119,7 @@ namespace gcore	//gcore context
 		void setEntry(const LocalizedString& entry);
 
 		/** Entry execution.
-			This will store the entry, then if it starts with "/" (by default),
+			This will store the entry, then if it starts with "$" (by default),
 			we parse it to get the parameters of the command and we execute the command.
 			Then we reset the entry.
 			If it is not a command, we just use the default command.
@@ -181,7 +181,7 @@ namespace gcore	//gcore context
 		/// @return Max entry length
 		unsigned int getMaxEntryLength() const {return m_maxEntryLength;}
 
-		/// @return True if the console will print an executed commmand.
+		/// @return True if the console will print an executed command.
 		bool willPrintCommandOnExecute() const { return m_printCommandOnExecute; }
 		void setPrintCommandOnExecute( bool printCommandOnExecute ){ m_printCommandOnExecute = printCommandOnExecute; }
 

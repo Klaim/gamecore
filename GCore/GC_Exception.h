@@ -10,9 +10,12 @@
 #endif
 
 #include "GC_String.h"
+#include <sstream>
 
 namespace gcore
 {
+
+
 	/** 
 	*	GCore exception base class.
 	*/
@@ -41,25 +44,25 @@ namespace gcore
 		///Error identifier code - deprecated
 		long getCode() const {return m_code;}
 		
-		///Copy operator
-		/*virtual void operator = (const Exception& exp )
+		/// Allow stream semantic for message addition
+		template< class T >
+		Exception& operator<<( T text )
 		{
-			m_code = exp.getCode();
-			m_file = exp.getFile();
-			m_function = exp.getFunction();
-			m_line = exp.getLine();
-			m_message = exp.getMessage();
-			
-		}*/
+			std::stringstream stream;
+			stream << m_message;
+			stream << text;
+			m_message = stream.str();
+			return *this;
+		}
 		
 		/** Exception constructor.
-			@param msg		Description of the error and other informations.
 			@param code		Error code. 
 			@param file		Source file name where the error occurred.
 			@param function	Function or method name where the exception occurred.
 			@param line		Line number in the file where the exception occurred. 
+			@param msg		Description of the error and other informations.
 		*/
-		Exception( const String& message, long code, const String& function ,  const String& file , long line   )	//Constructor
+		Exception( long code, const String& function ,  const String& file , long line, const String& message = String()  )	//Constructor
 			: m_message(message)
 			, m_function(function)
 			, m_file(file)
@@ -96,10 +99,10 @@ namespace gcore
 			@param function	Function or method name where the exception occurred.
 			@param line		Line number in the file where the exception occurred. 
 		*/
-		explicit AssertionException( const String& msg, const String& testExpression , const String& function ,  const String& file , long line )
-			: Exception( "/!\\ Assertion failed! : \n " + msg + " \n Test Expression : " + testExpression , -1 , function , file , line )
+		explicit AssertionException( const String& testExpression , const String& function ,  const String& file , long line, const String& msg = String() )
+			: Exception( -1 , function , file , line, String("/!\\ Assertion failed! : \n Test Expression : ") + testExpression  + "\n Description :\n"  )
 			, m_testExpression( testExpression )
-		{}
+		{  }
 
 		/** Expression used to test the assertion.
 		*/
@@ -112,31 +115,43 @@ namespace gcore
 
 	};
 
+	/// Hardware breakpoint (should be portable between 64bit and 32bit versions, certainly not with other compiler than vc)
+	struct DebugBreak
+	{
+		bool operator()()
+		{
+			::__debugbreak();
+			return true;
+		}
+		
+	};
+
 }
 
-/// Hardware breakpoint (for x86 hardware)
-#define GC_BREAKPOINT {__asm int 3}
 
-/// Throw a general gcore::Exception. Use it as a critical error.
-#define GC_EXCEPTION( msg ) throw gcore::Exception( msg , 0, __FUNCTION__ , __FILE__ , __LINE__ )
+
+
+/// @copydoc DebugBreak
+#define GC_BREAKPOINT (gcore::DebugBreak()())
+
+/// Throw a general gcore::Exception. Use it as a critical error. Use like this : GC_EXCEPTION << "This is " << 1 << "message" ;
+#define GC_EXCEPTION throw gcore::Exception( 0, __FUNCTION__ , __FILE__ , __LINE__ )
 
 /// Useful to remind implementer to add missing code once used.
 #ifdef GC_DEBUG
 	#define GC_NOT_IMPLEMENTED_YET GC_BREAKPOINT
 #else
-	#define GC_NOT_IMPLEMENTED_YET throw gcore::Exception( "Not implemented yet : DO IT NOW!!!" , 0, __FUNCTION__ , __FILE__ , __LINE__ )
+	#define GC_NOT_IMPLEMENTED_YET throw gcore::Exception(  0, __FUNCTION__ , __FILE__ , __LINE__ ) << "Not implemented yet : DO IT NOW!!!"
 #endif
 /// Useful in template code that should not be instantiated, forcing user to define or use specific implementations.
 #define GC_FORCE_IMPLEMENTATION static_assert( false )
 
-/// GCore assert macro that throw a gcore::AssertException on failure in debug mode.
+/// GCore assert macro that throw a gcore::AssertException on failure in debug mode.Use like this : GC_ASSERT( a.isGood(), "Object" << a.name() << " is not good!" << 42 );
 #ifdef GC_DEBUG
-#define GC_ASSERT( test , msg ) if(!(test)){ \
-			const gcore::String assert_msg( msg ); \
-			const gcore::String assert_test( #test ); \
-			GC_BREAKPOINT; \
-			throw gcore::AssertionException( assert_msg , assert_test , __FUNCTION__ , __FILE__ , __LINE__ ); \
-	}
+#define GC_ASSERT( assert_test , assert_msg ) \
+		if( !(assert_test) && GC_BREAKPOINT ) \
+			(throw gcore::AssertionException( #assert_test , __FUNCTION__ , __FILE__ , __LINE__ ) << assert_msg )
+
 #else
 	#define GC_ASSERT(test , msg)
 #endif

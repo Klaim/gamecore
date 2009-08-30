@@ -2,7 +2,7 @@
 #define GCORE_LOGMANAGER_H
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include "GC_Common.h"	//Use gcore System common defines
 #include "GC_Singleton.h"
@@ -24,8 +24,6 @@ namespace gcore
 	*/
 	class GCORE_API LogManager 
 	{
-		typedef std::map< String, Log* > LogMap;
-	
 	public:
 
 		/// Default log file if not defined : 
@@ -99,9 +97,10 @@ namespace gcore
 	
 	private:
 
-		/**	This map contains every Log that the LogManager created.
-		**/
-		LogMap m_logList;
+		typedef std::tr1::unordered_map< String, Log* > LogIndex;
+
+		/// Index of all a logs created.
+		LogIndex m_logList;
 
 		/// Default Log : 
 		Log* m_defaultLog;

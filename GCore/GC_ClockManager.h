@@ -2,7 +2,7 @@
 #define GCORE_CLOCKMANAGER_H
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include "GC_String.h"
 
@@ -20,6 +20,12 @@ namespace gcore
 	class GCORE_API ClockManager
 	{
 	public:
+
+		/// Index of clocks by name.
+		typedef std::tr1::unordered_map< String , Clock*> ClockIndex;
+
+		/// List of clocks.
+		typedef std::vector< Clock* > ClockList;
 
 		/** Create a Clock object.
 			The name of the Clock must be unique for this ClockManager,
@@ -81,11 +87,11 @@ namespace gcore
 
 		/** Return the registered Clock list.
 		*/
-		const std::vector<Clock*>& getClockList() const {return m_clockList;}
+		const ClockList& getClockList() const {return m_clockList;}
 
 		/** Return the named index of all named clocks registered.
 		*/
-		const std::map< const String , Clock*>& getNamedClocksIndex() const {return m_clockIndex;}
+		const ClockIndex& getNamedClocksIndex() const {return m_clockIndex;}
 
 
 		/** Constructor.
@@ -109,11 +115,11 @@ namespace gcore
 
 		/** Named index of all the Clocks.
 		*/
-		std::map< const String, Clock* > m_clockIndex;
+		ClockIndex m_clockIndex;
 
 		/** List of all Clocks created by this ClockManager.
 		*/
-		std::vector< Clock* > m_clockList;
+		ClockList m_clockList;
 
 		/// Time value of the last update, from TimeReferenceProvider (in seconds).
 		TimeValue m_lastUpdateTime;
