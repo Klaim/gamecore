@@ -3,7 +3,7 @@
 #pragma once
 
 #include <vector>
-#include <map>
+#include <unordered_map>
 #include <boost/pool/poolfwd.hpp>
 
 #include "GC_Common.h"
@@ -20,6 +20,8 @@ namespace gcore
 	{
 	public:
 
+		typedef std::vector<Timer*> TimerList;
+		typedef std::tr1::unordered_map< String , Timer* > TimerIndex;
 		typedef boost::object_pool< Timer > TimerPool;
 
 		/** Constructor.
@@ -56,11 +58,11 @@ namespace gcore
 
 		/** Return the registered Timer list.
 		*/
-		const std::vector<Timer*>& getTimerList() const {return m_timerList;}
+		const TimerList& getTimerList() const {return m_timerList;}
 
 		/** Return the named index of all named timers registered.
 		*/
-		const std::map< const String , Timer*>& getNamedTimersIndex() const {return m_namedTimersIndex;}
+		const TimerIndex& getNamedTimersIndex() const {return m_namedTimersIndex;}
 
 
 		/** Update all created timers.
@@ -76,10 +78,10 @@ namespace gcore
 		TimerPool* m_timerPool;
 
 		/// Created timers list.
-		std::vector< Timer* > m_timerList;
+		TimerList m_timerList;
 
 		/// Named timer index.
-		std::map< const String , Timer* > m_namedTimersIndex;
+		TimerIndex m_namedTimersIndex;
 	
 	};
 	

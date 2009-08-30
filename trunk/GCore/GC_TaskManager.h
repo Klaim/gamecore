@@ -2,7 +2,7 @@
 #define GCORE_TASKSYSTEM_H
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <list>
 #include <vector>
 #include "GC_Common.h"
@@ -32,6 +32,7 @@ namespace gcore
 
 	public:
 		typedef std::list< Task* > TaskList;
+		typedef std::tr1::unordered_map< String , Task*> TaskIndex;
 
 
 		/** Constructor. */
@@ -154,7 +155,7 @@ namespace gcore
 
 		/** Return the named index of all named tasks registered.
 		*/
-		const std::map< const String , Task*>& getNamedTasksIndex() const {return m_namedTasksIndex;}
+		const TaskIndex& getNamedTasksIndex() const {return m_namedTasksIndex;}
 
 	private:
 
@@ -171,7 +172,7 @@ namespace gcore
 		};
 
 		/// Index of named registered Tasks.
-		std::map< const String , Task* > m_namedTasksIndex;
+		TaskIndex m_namedTasksIndex;
 		
 		/// Registered Tasks list.
 		TaskList m_registeredTasksList;

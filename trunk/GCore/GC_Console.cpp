@@ -8,7 +8,7 @@
 
 namespace gcore
 {
-	const LocalizedString Console::DEFAULT_PREFIX( L"/" );
+	const LocalizedString Console::DEFAULT_PREFIX( L"$" );
 
 	Console::Console(unsigned long maxEntries , unsigned long maxEntryLength  , unsigned long maxTexts )
 		: m_entry()

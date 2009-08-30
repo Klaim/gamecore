@@ -12,7 +12,7 @@ namespace gcore
 
 		if( logName != "" )
 		{
-			LogMap::iterator logIt = m_logList.find( logName );
+			LogIndex::iterator logIt = m_logList.find( logName );
 			if( logIt != m_logList.end() )
 			{
 				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
@@ -21,14 +21,14 @@ namespace gcore
 #ifdef GC_DEBUG
 			else
 			{
-				GC_EXCEPTION( String( "Tried to add a listener in a log not found in this log manager! Log searched : " ) + logName );
+				GC_EXCEPTION << "Tried to add a listener in a log not found in this log manager! Log searched : " << logName;
 			}
 #endif
 		}
 		else
 		{
 			// register in all the logs
-			LogMap::iterator logIt = m_logList.begin();
+			LogIndex::iterator logIt = m_logList.begin();
 			for( ; logIt != m_logList.end(); ++logIt )
 			{
 				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
@@ -47,7 +47,7 @@ namespace gcore
 
 		if( logName != "" )
 		{
-			LogMap::iterator logIt = m_logList.find( logName );
+			LogIndex::iterator logIt = m_logList.find( logName );
 			if( logIt != m_logList.end() )
 			{
 				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
@@ -56,14 +56,14 @@ namespace gcore
 #ifdef GC_DEBUG
 			else
 			{
-				GC_EXCEPTION( String( "Tried to unregister a listener from a log not found in this log manager! Log searched : " ) + logName );
+				GC_EXCEPTION << "Tried to unregister a listener from a log not found in this log manager! Log searched : " << logName;
 			}
 #endif
 		}
 		else
 		{
 			// unregister from all logs
-			LogMap::iterator logIt = m_logList.begin();
+			LogIndex::iterator logIt = m_logList.begin();
 			for( ; logIt != m_logList.end(); ++logIt )
 			{
 				GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
@@ -80,7 +80,7 @@ namespace gcore
 		if(m_logList.find(name)!=m_logList.end())
 		{
 			//tried to create a log already created!!!
-			GC_EXCEPTION("Tried to create a log already created!!!");
+			GC_EXCEPTION << "Tried to create a log already created!!!";
 		}
 
 		Log* log = new Log( *this, name, isNewFile );
@@ -93,7 +93,7 @@ namespace gcore
 
 	void LogManager::destroyLog( const String& name )
 	{
-		LogMap::iterator it = m_logList.find( name );
+		LogIndex::iterator it = m_logList.find( name );
 		GC_ASSERT( it != m_logList.end(), String( "Tried to destroy a log not created in the log manager! Log name : ") + name );
 		delete it->second;
 		m_logList.erase( it );
@@ -103,7 +103,7 @@ namespace gcore
 	//Retrieves a Log by name if exists, return nullptr if it don't exits
 	Log* LogManager::getLog(const String& logName)
 	{
-		LogMap::iterator logIt = m_logList.find(logName);
+		LogIndex::iterator logIt = m_logList.find(logName);
 		if(logIt != m_logList.end())
 		{
 			return logIt->second;
@@ -116,7 +116,7 @@ namespace gcore
 	void LogManager::logMessage( const String& logName, const String& message )
 	{
 		//Find the logIt to let it handle the message
-		LogMap::iterator logIt = m_logList.find( logName );
+		LogIndex::iterator logIt = m_logList.find( logName );
 		if( logIt != m_logList.end() )
 		{
 			GC_ASSERT( logIt->second != nullptr, "Found a null log in log manager!" );
@@ -125,7 +125,7 @@ namespace gcore
 #ifdef GC_DEBUG
 		else
 		{
-			GC_EXCEPTION( String( "Logged a message in a log not found in this log manager! Log searched : " ) + logName );
+			GC_EXCEPTION << "Logged a message in a log not found in this log manager! Log searched : " <<  logName;
 		}
 #endif
 	}
@@ -164,7 +164,7 @@ namespace gcore
 	{
 		m_defaultLog->logMessage("Terminate LogManager.");
 		// Destroy all logs
-		LogMap::iterator it;
+		LogIndex::iterator it;
 		for (it = m_logList.begin(); it != m_logList.end(); ++it)
 		{
 			GC_ASSERT( it->second != nullptr, "Found a null log in log manager!" );

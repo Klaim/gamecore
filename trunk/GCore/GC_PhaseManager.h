@@ -2,7 +2,7 @@
 #define GC_PHASEMANAGER_H
 #pragma once
 
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 #include "GC_Common.h"
@@ -85,8 +85,10 @@ namespace gcore
 		
 	private:
 
+		typedef std::tr1::unordered_map< String,  PhasePtr > PhaseIndex;
+
 		/// phase index
-		std::map< String,  PhasePtr > m_phaseIndex;
+		PhaseIndex m_phaseIndex;
 
 		// non copyable
 		PhaseManager(const Phase& ohterPhase);

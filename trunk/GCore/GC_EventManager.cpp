@@ -24,7 +24,7 @@ namespace gcore
 	*/
 	void EventManager::processEvent(const EventPtr& eventToProcess)
 	{
-		if(!eventToProcess.get()) GC_EXCEPTION("Tried to process a null Event.");
+		if(!eventToProcess.get()) GC_EXCEPTION << "Tried to process a null Event.";
 
 		typedef std::multimap<EventType, EventListener*  >::iterator I;
 		std::pair<I,I> result=m_eventListenerPool.equal_range(eventToProcess->getType());//Get EventListeners waiting for the same type of Event
@@ -55,7 +55,7 @@ namespace gcore
 	*/
 	void EventManager::registerEventListener(EventListener* eventListener)
 	{
-		if(!eventListener) GC_EXCEPTION( "Tried to add a null EventListener.");
+		if(!eventListener) GC_EXCEPTION << "Tried to add a null EventListener.";
 
 		using namespace std;
 
@@ -67,7 +67,7 @@ namespace gcore
 			if(e==eventListener)
 			{
 				//Tried to add this object twice!
-				GC_EXCEPTION("Tried to add an EventListener twice!");
+				GC_EXCEPTION << "Tried to add an EventListener twice!";
 			}
 		}
 
@@ -83,7 +83,7 @@ namespace gcore
 	*/
 	void EventManager::unregisterEventListener(EventListener* eventListener)
 	{
-		if(!eventListener) GC_EXCEPTION( "Tried to remove a null EventListener!");
+		if(!eventListener) GC_EXCEPTION << "Tried to remove a null EventListener!";
 		
 		
 		typedef std::multimap<EventType, EventListener*  >::iterator I;
@@ -102,7 +102,7 @@ namespace gcore
 			}
 		}
 		//event catcher not found!!
-		GC_EXCEPTION("EventListener not found!");
+		GC_EXCEPTION << "EventListener not found!";
 
 
 	}
@@ -125,7 +125,7 @@ namespace gcore
 	*/
 	void EventManager::sendEvent( const EventPtr& eventToSend , bool immediate/*=false*/ )
 	{
-		if(!eventToSend.get()) GC_EXCEPTION( "Tried to send a null Event!");
+		if(!eventToSend.get()) GC_EXCEPTION << "Tried to send a null Event!";
 
 		if(immediate)//Processing of the Event must be done NOW!
 		{
@@ -161,7 +161,7 @@ namespace gcore
 	*/
 	void EventManager::cancelEvent( const EventPtr& eventToCancel )
 {
-		if(!eventToCancel.get()) GC_EXCEPTION( "Tried to cancel a null Event!");
+		if(!eventToCancel.get()) GC_EXCEPTION << "Tried to cancel a null Event!";
 
 		m_eventList.remove( eventToCancel );
 		

@@ -130,7 +130,7 @@ namespace gcore
 				std::stringstream errorMsg;
 				errorMsg << "Unknown TaskState being translated in text! State value = " ;
 				errorMsg << taskState;
-				GC_EXCEPTION( errorMsg.str() );
+				GC_EXCEPTION <<  errorMsg.str();
 			}
 		}
 

@@ -39,7 +39,7 @@ namespace gcore
 		if( m_clockIndex.find(name)!=m_clockIndex.end())
 		{
 			//Name already registered
-			GC_EXCEPTION("Tried to create a Clock with a name already registered!");
+			GC_EXCEPTION << "Tried to create a Clock with a name already registered!";
 		}
 
 		//create the clock
@@ -65,7 +65,7 @@ namespace gcore
 		GC_ASSERT( clock != nullptr, "Tried to destroy a null clock!" );
 		GC_ASSERT( std::count( m_clockList.begin(), m_clockList.end(), clock ) == 1 , String( "Tried to destroy a clock that was not created by this manager! Clock name : ") + clock->getName() );
 
-		for(std::vector<Clock*>::iterator it= m_clockList.begin(); it != m_clockList.end(); ++it)
+		for(ClockList::iterator it= m_clockList.begin(); it != m_clockList.end(); ++it)
 		{
 			Clock* registeredClock = (*it);
 			GC_ASSERT_NOT_NULL( registeredClock );
@@ -95,7 +95,7 @@ namespace gcore
 	void ClockManager::destroyAllClocks()
 	{
 		//delete all clocks
-		for(std::vector<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it)
+		for(ClockList::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it)
 		{
 			Clock* clock = *it;
 			GC_ASSERT( clock != nullptr, "Found a null clock in the clock list!" );
@@ -116,7 +116,7 @@ namespace gcore
 	{
 		Clock* result = nullptr;
 		
-		std::map< const String, Clock* >::iterator it = m_clockIndex.find(name);
+		ClockIndex::iterator it = m_clockIndex.find(name);
 		if( it != m_clockIndex.end() )
 			result = it->second;
 		
@@ -142,7 +142,7 @@ namespace gcore
 		}
 
 		//update clocks
-		for (std::vector<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
+		for (ClockList::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
 		{
 			Clock* clock = (*it);
 			GC_ASSERT_NOT_NULL( clock );
@@ -156,7 +156,7 @@ namespace gcore
 
 	void ClockManager::reset()
 	{
-		for (std::vector<Clock*>::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
+		for (ClockList::iterator it = m_clockList.begin(); it != m_clockList.end(); ++it )
 		{
 			Clock* clock = (*it);
 			GC_ASSERT_NOT_NULL( clock );
