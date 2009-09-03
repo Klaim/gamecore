@@ -3,28 +3,23 @@
 
 #include "GC_Log.h"
 #include "GC_LogListener.h"
+#include "GC_LogManager.h"
 
 namespace gcore
 {
-	void Log::logMessage( const String& message )
-	{
-		logText(); // to be sure we flush the current text if any (when "composing" a message)
-		addText( message ); 
-		logText(); // really log the message
-	}
-
 	//only LogManager should create a log
 	Log::Log( const LogManager& logManager, const String& name, bool isNewFile )
 		: m_logManager(logManager)
 		, m_name(name)
 	{
+		const String filepath = logManager.getRootDirectory() + "/" + name;
 		if(isNewFile)
 		{
-			m_fileStream.open(name.c_str(), std::ios_base::trunc);
+			m_fileStream.open(filepath.c_str(), std::ios_base::trunc);
 		}
 		else
 		{
-			m_fileStream.open(name.c_str(), std::ios_base::app);
+			m_fileStream.open(filepath.c_str(), std::ios_base::app);
 		}
 		//new session : 
 		using namespace boost::posix_time;
@@ -56,6 +51,13 @@ namespace gcore
 
 		m_registeredListeners.erase( std::remove( m_registeredListeners.begin(), m_registeredListeners.end(), logListener ), m_registeredListeners.end() );
 
+	}
+
+	void Log::logMessage( const String& message )
+	{
+		logText(); // to be sure we flush the current text if any (when "composing" a message)
+		addText( message ); 
+		logText(); // really log the message
 	}
 
 	void Log::addText( const String& text )
