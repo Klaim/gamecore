@@ -9,7 +9,7 @@
 namespace gcore
 {
 	
-	/** Simple time profiling tool.
+	/** Simple time profiling tool. 
 	*/
 	class GCORE_API Profiler
 	{
@@ -20,33 +20,33 @@ namespace gcore
 
 		/** Constructor.
 			@param timeReference	Time reference provider used to record time spans.
-			@parama maxRecordCount	Maximum number of records allowed for this profiler or 0 if no limit is set.
+			@param maxRecordCount	Maximum number of records allowed for this profiler or 0 if no limit is set.
 		*/
-		Profiler( const TimeReferenceProvider& timeReference , unsigned int maxRecordCount = 0);
+		Profiler( const TimeReferenceProvider& timeReference , unsigned long maxRecordCount = 0);
 	
 		/** Destructor.
 		*/
 		~Profiler();
 
+		/** Start to record the time span until the call of stop.
+			@see stop
+		*/
+		void start();
+
+		/** Stop to record the current time span and store it.
+			@remark Call start before this one. @see start
+			@return The stored time span or 0 if start was not called before.
+		*/
+		TimeValue stop();
+
 		/** Record the time span between the last call to this method to the current one, 
 			or record the current call time to register the time span the next time if it's the 
 			first call to this method.
 			@remark Use this method to check the time spent between two same function call.
-
+			
 			@return Recorded time span between the last call and the current one, or 0 if it's the first call.
 		*/
-		TimeValue recordTimeSpan( void );
-
-		/** Start to record the time span until the call of stopRecordTimeSpan.
-			@see stopRecordTimeSpan
-		*/
-		void startRecordTimeSpan( void );
-
-		/** Stop to record the current time span and store it.
-			@remark Call startRecordTimeSpan before this one. @see startRecordTimeSpan
-			@return The stored time span or 0 if startRecordTimeSpan was not called before.
-		*/
-		TimeValue stopRecordTimeSpan( void );
+		TimeValue record();
 
 		/** Clear the records.
 			@remark Calling this method will not deallocate memory used by the profiler.
@@ -57,32 +57,40 @@ namespace gcore
 			@param outputStream		Stream to append the text report to.
 			@param isFullReport		Should be true if the report have to provide all the time span records.
 		*/
-		void textReport( std::ostream& outputStream , bool isFullReport = false ) const;
+		void report( std::ostream& outputStream , bool isFullReport = false ) const;
+
+		/** Return an ANSI text report about the current records.
+			@param isFullReport		Should be true if the report have to provide all the time span records.
+		*/
+		String report( bool isFullReport = false ) const;
 		
 		/** Recorded time spans.
 		*/
-		const TimeSpanList & getTimeSpans() const { return m_timeSpans; }
+		const TimeSpanList & timeSpans() const { return m_timeSpans; }
 
-		/** Returns the biggest time span recorded until here or 0 if no records.
+		/** @return The biggest time span recorded until here or 0 if no records.
 		*/
-		TimeValue getBiggestTimeSpan() const;
+		TimeValue biggest() const;
 
-		/** Returns the shortest time span recorded until here or 0 if no records.
+		/** @return The shortest time span recorded until here or 0 if no records.
 		*/
-		TimeValue getShortestTimeSpan() const;
+		TimeValue shortest() const;
 
-		/** Returns the average time span of the recorded time spans.
+		/** @return The average time span of the recorded time spans.
 		*/
-		TimeValue getAverageTimeSpan() const;
+		TimeValue average() const;
 
-		/** Returns the number of time spans recorded.
+		/** @return The number of time spans recorded.
 		*/
-		unsigned int getRecordCount() const { return static_cast< unsigned int>( m_timeSpans.size() ); }
+		unsigned long count() const { return static_cast< unsigned long>( m_timeSpans.size() ); }
 
-		/** Returns the max number of records allowed or 0 if no limit set.
+		/** @return The max number of records allowed or 0 if no limit set.
 		*/
-		unsigned int getMaxRecordCount() const { return m_maxRecordCount; }
+		unsigned long maxCount() const { return m_maxRecordCount; }
 
+		/** Reserve the memory for the given estimated count time span to limit record performance impact.
+		*/
+		void reserve( unsigned long estimatedCount );
 
 	protected:
 		
@@ -98,7 +106,7 @@ namespace gcore
 		const TimeReferenceProvider& m_timeReference;
 
 		/// Maximum number of records allowed for this profiler or 0 if no limit is set.
-		const unsigned int m_maxRecordCount;
+		const unsigned long m_maxRecordCount;
 	};
 	
 

@@ -1,5 +1,5 @@
 #include <algorithm>
-
+#include <sstream>
 #include "GC_Profiler.h"
 
 
@@ -7,7 +7,7 @@ namespace gcore
 {
 	
 
-	Profiler::Profiler( const TimeReferenceProvider& timeReference  , unsigned int maxRecordCount) 
+	Profiler::Profiler( const TimeReferenceProvider& timeReference  , unsigned long maxRecordCount) 
 		: m_lastRecordTime( 0 )
 		, m_timeReference( timeReference )
 		, m_maxRecordCount( maxRecordCount )
@@ -24,12 +24,18 @@ namespace gcore
 
 	}
 
-	void Profiler::startRecordTimeSpan( void )
+
+	void Profiler::reserve( unsigned long estimatedCount )
+	{
+		m_timeSpans.reserve( estimatedCount );
+	}
+
+	void Profiler::start()
 	{
 		m_lastRecordTime = m_timeReference.getTimeSinceStart();
 	}
 
-	gcore::TimeValue Profiler::stopRecordTimeSpan( void )
+	gcore::TimeValue Profiler::stop()
 	{
 		if( m_lastRecordTime != 0 )
 		{
@@ -61,31 +67,31 @@ namespace gcore
 		}
 	}
 
-	TimeValue Profiler::recordTimeSpan( void )
+	TimeValue Profiler::record()
 	{
 		if( m_lastRecordTime != 0 )
 		{
-			return stopRecordTimeSpan();
+			return stop();
 		}
 		else
 		{
 			// first record : just get the current time for the next time we track
-			startRecordTimeSpan();
+			start();
 			return 0;
 		}
 	}
 
-	void Profiler::textReport( std::ostream& outputStream , bool isFullReport /*= false */ ) const
+	void Profiler::report( std::ostream& outputStream , bool isFullReport /*= false */ ) const
 	{
 		// gather data...
-		const TimeValue biggestTimeSpan( getBiggestTimeSpan() );
-		const TimeValue shortestTimeSpan( getShortestTimeSpan() );
-		const TimeValue averageTimeSpan( getAverageTimeSpan() );
+		const TimeValue biggestTimeSpan( biggest() );
+		const TimeValue shortestTimeSpan( shortest() );
+		const TimeValue averageTimeSpan( average() );
 
-		outputStream << std::endl << "Profiler recorded "<< m_timeSpans.size() << " time spans : "<< std::endl;
-		outputStream << "\tBiggest time span : \t" << biggestTimeSpan << " millisecs" << std::endl;
-		outputStream << "\tShortest time span : \t" << shortestTimeSpan << " millisecs" << std::endl;
-		outputStream << "\tAverage time span : \t"<< averageTimeSpan << " millisecs" << std::endl;
+		outputStream <<  "\nProfiler recorded "<< m_timeSpans.size() << " time spans : " << '\n';
+		outputStream << "\tBiggest time span : \t" << biggestTimeSpan << " millisecs" << '\n';
+		outputStream << "\tShortest time span : \t" << shortestTimeSpan << " millisecs" << '\n';
+		outputStream << "\tAverage time span : \t"<< averageTimeSpan << " millisecs" << '\n';
 
 		if( isFullReport )
 		{
@@ -96,10 +102,16 @@ namespace gcore
 				outputStream << "[" << i << "] = "<< m_timeSpans[i] << " millisecs" << std::endl;
 			}
 		}
-		outputStream.flush();
 	}
 
-	TimeValue Profiler::getBiggestTimeSpan() const
+	String Profiler::report( bool isFullReport ) const
+	{
+		std::stringstream text;
+		report( text, isFullReport );
+		return text.str();
+	}
+
+	TimeValue Profiler::biggest() const
 	{
 		TimeSpanList::const_iterator it( std::max_element( m_timeSpans.begin(), m_timeSpans.end() ));
 		if( it != m_timeSpans.end())
@@ -109,7 +121,7 @@ namespace gcore
 		else return 0;
 	}
 
-	TimeValue Profiler::getShortestTimeSpan() const
+	TimeValue Profiler::shortest() const
 	{
 		TimeSpanList::const_iterator it( std::min_element( m_timeSpans.begin(), m_timeSpans.end() ));
 		if( it != m_timeSpans.end())
@@ -119,7 +131,7 @@ namespace gcore
 		else return 0;
 	}
 
-	TimeValue Profiler::getAverageTimeSpan() const
+	TimeValue Profiler::average() const
 	{
 		if( m_timeSpans.empty() ) return 0;
 
