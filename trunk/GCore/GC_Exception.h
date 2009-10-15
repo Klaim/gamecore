@@ -10,7 +10,7 @@
 #endif
 
 #include "GC_String.h"
-#include <sstream>
+#include "GC_StringStream.h"
 
 namespace gcore
 {
@@ -48,7 +48,7 @@ namespace gcore
 		template< class T >
 		Exception& operator<<( T text )
 		{
-			std::stringstream stream;
+			StringStream stream;
 			stream << m_message;
 			stream << text;
 			m_message = stream.str();
@@ -120,9 +120,23 @@ namespace gcore
 	{
 		bool operator()()
 		{
-			::__debugbreak();
+			m_message;
+			::__debugbreak(); // debug mode : look at the message value!
 			return true;
 		}
+
+		/// Allow stream semantic for message addition
+		template< class T >
+		DebugBreak& operator<<( T text )
+		{
+			StringStream stream;
+			stream << m_message;
+			stream << text;
+			m_message = stream.str();
+			return *this;
+		}
+
+		String m_message;
 		
 	};
 
@@ -132,14 +146,14 @@ namespace gcore
 
 
 /// @copydoc DebugBreak
-#define GC_BREAKPOINT (gcore::DebugBreak()())
+#define GC_BREAKPOINT( message ) ((gcore::DebugBreak() << message)()) // create the debug break, stream the message in, call the final debug break (to get the message)
 
 /// Throw a general gcore::Exception. Use it as a critical error. Use like this : GC_EXCEPTION << "This is " << 1 << "message" ;
 #define GC_EXCEPTION throw gcore::Exception( 0, __FUNCTION__ , __FILE__ , __LINE__ )
 
 /// Useful to remind implementer to add missing code once used.
 #ifdef GC_DEBUG
-	#define GC_NOT_IMPLEMENTED_YET GC_BREAKPOINT
+	#define GC_NOT_IMPLEMENTED_YET GC_BREAKPOINT( "Not implemented yet : DO IT NOW!!!" )
 #else
 	#define GC_NOT_IMPLEMENTED_YET throw gcore::Exception(  0, __FUNCTION__ , __FILE__ , __LINE__ ) << "Not implemented yet : DO IT NOW!!!"
 #endif
@@ -149,7 +163,7 @@ namespace gcore
 /// GCore assert macro that throw a gcore::AssertException on failure in debug mode.Use like this : GC_ASSERT( a.isGood(), "Object" << a.name() << " is not good!" << 42 );
 #ifdef GC_DEBUG
 #define GC_ASSERT( assert_test , assert_msg ) \
-		if( !(assert_test) && GC_BREAKPOINT ) \
+		if( !(assert_test) && GC_BREAKPOINT(assert_msg) ) \
 			(throw gcore::AssertionException( #assert_test , __FUNCTION__ , __FILE__ , __LINE__ ) << assert_msg )
 
 #else

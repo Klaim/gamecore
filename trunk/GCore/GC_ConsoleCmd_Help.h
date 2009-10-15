@@ -2,7 +2,7 @@
 #define GC_CONSOLECMD_HELP_H
 #pragma once
 
-#include <sstream>
+#include "GC_StringStream.h"
 
 #include "GC_Common.h"
 
@@ -32,7 +32,7 @@ namespace gcore
 
 		LocalizedString help() const { return m_helpText; }
 
-		void printCommandHelp( std::wstringstream& output, const LocalizedString& commandPrefix, const ConsoleCommandPtr& command );
+		void printCommandHelp( LocalizedStringStream& output, const LocalizedString& commandPrefix, const ConsoleCommandPtr& command );
 
 		const LocalizedString m_helpText;
 

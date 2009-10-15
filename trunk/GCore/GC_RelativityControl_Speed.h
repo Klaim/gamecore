@@ -90,7 +90,7 @@ namespace interpolation
 
 			GC_ASSERT( getClock() != nullptr , "No clock set before usage!" );
 
-			const TimeValue& deltaTime = getClock()->getDeltaTime();
+			const TimeValue& deltaTime = getClock()->deltaTime();
 			m_timePassedSinceStart += deltaTime;
 			const TimeValue secondsPassed ( deltaTime / 1000 );
 			const TimeValue secondsPassedSinceStart( m_timePassedSinceStart / 1000 );

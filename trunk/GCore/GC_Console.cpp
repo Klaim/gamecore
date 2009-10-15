@@ -8,7 +8,7 @@
 
 namespace gcore
 {
-	const LocalizedString Console::DEFAULT_PREFIX( L"$" );
+	const LocalizedString Console::DEFAULT_PREFIX( L"/" );
 
 	Console::Console(unsigned long maxEntries , unsigned long maxEntryLength  , unsigned long maxTexts )
 		: m_entry()
@@ -139,7 +139,7 @@ namespace gcore
 		if( m_activeCommand.get() != nullptr )
 		{
 			// there is already an active command : just send it the parameters!
-			parseParameters( m_entry, m_paramList, m_activeCommand->getParamSeparator() );
+			parseParameters( m_entry, m_paramList, m_activeCommand->paramSeparator() );
 			
 			executeActiveCommand();
 		}
@@ -165,7 +165,7 @@ namespace gcore
 
 					//get the parameters : 
 					const LocalizedString params = m_entry.substr( commandName.length() + m_commandCallPrefix.length() );
-					parseParameters( params, m_paramList, m_activeCommand->getParamSeparator() );
+					parseParameters( params, m_paramList, m_activeCommand->paramSeparator() );
 
 					// then execute it!
 					executeActiveCommand();
@@ -183,7 +183,7 @@ namespace gcore
 				//execute default command with the entry as parameter if defined:
 				if(m_defaultCommand)
 				{
-					parseParameters( m_entry, m_paramList, m_defaultCommand->getParamSeparator() );
+					parseParameters( m_entry, m_paramList, m_defaultCommand->paramSeparator() );
 					m_defaultCommand->execute((*this),m_paramList);
 
 				}
@@ -202,9 +202,9 @@ namespace gcore
 
 	void Console::addCommand( const ConsoleCommandPtr& command )
 	{
-		GC_ASSERT( !command->getName().empty(), "Tried to add an unnamed ConsoleCommand!" );
+		GC_ASSERT( !command->name().empty(), "Tried to add an unnamed ConsoleCommand!" );
 		GC_ASSERT( &command != nullptr && command.get() != nullptr , "Tried to add a null ConsoleCommand!");
-		m_commandIndex[ command->getName() ] = command;
+		m_commandIndex[ command->name() ] = command;
 	}
 
 	void Console::removeCommand(const LocalizedString& name)
@@ -223,7 +223,7 @@ namespace gcore
 		// command not found!
 	}
 
-	ConsoleCommandPtr Console::getCommand(const LocalizedString& name)
+	ConsoleCommandPtr Console::command(const LocalizedString& name)
 	{
 		GC_ASSERT( !name.empty(), "Tried to get an unnamed ConsoleCommand!" );
 
@@ -238,7 +238,7 @@ namespace gcore
 		return ConsoleCommandPtr();
 	}
 
-	void Console::setDefaultCommand(const LocalizedString& name)
+	void Console::defaultCommand(const LocalizedString& name)
 	{
 		//just set nullptr if the name is empty
 		if(name.empty())
@@ -255,14 +255,14 @@ namespace gcore
 		}
 	}
 	
-	void Console::setCommandCallPrefix( const LocalizedString& commandCallPrefix )
+	void Console::commandCallPrefix( const LocalizedString& commandCallPrefix )
 	{
 		m_commandCallPrefix = boost::algorithm::trim_copy( commandCallPrefix );
 		
 		GC_ASSERT( !m_commandCallPrefix.empty(), "Tried to set an empty command call prefix!" );
 	}
 
-	void Console::setEntry( const LocalizedString& entry )
+	void Console::entry( const LocalizedString& entry )
 	{
 		m_entry = entry;
 		
@@ -311,7 +311,7 @@ namespace gcore
 		printText(m_entry); // display
 	}
 
-	bool Console::setCursorPosition( unsigned long cursorPos )
+	bool Console::cursorPosition( unsigned long cursorPos )
 	{
 		bool rightMove = false;
 
@@ -339,7 +339,7 @@ namespace gcore
 	{
 		if( m_entry.empty() )
 		{
-			setCursorPosition( 0 );
+			cursorPosition( 0 );
 			return 0;
 		}
 
@@ -357,7 +357,7 @@ namespace gcore
 		{
 			// the new position is right
 			const unsigned long finalMove = std::abs( static_cast<long>(m_cursorPos - wantedCursorPos) );
-			setCursorPosition( wantedCursorPos );
+			cursorPosition( wantedCursorPos );
 			return finalMove;
 		}
 		else
@@ -372,12 +372,12 @@ namespace gcore
 
 	void Console::moveCursorToEnd()
 	{
-		setCursorPosition( static_cast<unsigned long>( m_entry.size() ) );
+		cursorPosition( static_cast<unsigned long>( m_entry.size() ) );
 	}
 
 	void Console::moveCursorToBegin()
 	{
-		setCursorPosition( 0 );
+		cursorPosition( 0 );
 	}
 
 	unsigned long Console::removeEntryKeys( unsigned long keyCount, bool onTheLeft )
@@ -429,7 +429,7 @@ namespace gcore
 		if( wantedEntryIdx >= 0 && static_cast<std::size_t>( wantedEntryIdx ) < m_lastEntries.size() ) 
 		{
 			m_entryHistoryCursorPos += (steps * stepUnit);
-			setEntry( m_lastEntries[ m_lastEntries.size() - 1 - wantedEntryIdx  ] );
+			entry( m_lastEntries[ m_lastEntries.size() - 1 - wantedEntryIdx  ] );
 		}
 	}
 

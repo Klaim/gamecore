@@ -63,7 +63,7 @@ namespace gcore
 	void ClockManager::destroyClock(Clock* clock)
 	{
 		GC_ASSERT( clock != nullptr, "Tried to destroy a null clock!" );
-		GC_ASSERT( std::count( m_clockList.begin(), m_clockList.end(), clock ) == 1 , String( "Tried to destroy a clock that was not created by this manager! Clock name : ") + clock->getName() );
+		GC_ASSERT( std::count( m_clockList.begin(), m_clockList.end(), clock ) == 1 , String( "Tried to destroy a clock that was not created by this manager! Clock name : ") + clock->name() );
 
 		for(ClockList::iterator it= m_clockList.begin(); it != m_clockList.end(); ++it)
 		{
@@ -75,7 +75,7 @@ namespace gcore
 				//Found!
 				//unregister
 				m_clockList.erase(it);
-				m_clockIndex.erase( clock->getName() );
+				m_clockIndex.erase( clock->name() );
 				
 				//destroy
 				delete clock;

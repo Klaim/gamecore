@@ -1,5 +1,5 @@
 #include <algorithm>
-#include <sstream>
+#include "GC_StringStream.h"
 #include "GC_Profiler.h"
 
 
@@ -106,7 +106,7 @@ namespace gcore
 
 	String Profiler::report( bool isFullReport ) const
 	{
-		std::stringstream text;
+		StringStream text;
 		report( text, isFullReport );
 		return text.str();
 	}

@@ -47,7 +47,7 @@ namespace gcore
 		  virtual ~Task();
 
 		/// Name of the Task (if set on construction).
-		inline const String& getName() const { return m_name; }
+		inline const String& name() const { return m_name; }
 	
 		/** Activate the Task.
 			The Task must be registered by a TaskManager.
@@ -99,20 +99,20 @@ namespace gcore
 			tasks list according to it's new priority.
 			@param priority New priority value for this Task.
 		*/
-		void setPriority(const TaskPriority& priority);
+		void priority(const TaskPriority& priority);
 
 		/** Priority : ascending order of execution for each cycle.
 			@see 
 		*/
-		inline const TaskPriority& getPriority() const { return m_priority; }
+		inline const TaskPriority& priority() const { return m_priority; }
 
 		/// Current state of the Task.
-		inline const TaskState& getState() const { return m_state; }
+		inline const TaskState& state() const { return m_state; }
 
 		
 		/** The Task manager currently managing this task or null if this task is not registered.
 		*/
-		inline TaskManager* getTaskManager() const { return m_taskManager; };
+		inline TaskManager* taskManager() const { return m_taskManager; };
 	
 
 		bool isActive() const { return m_state == TS_ACTIVE; }

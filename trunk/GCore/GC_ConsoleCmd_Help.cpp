@@ -18,7 +18,7 @@ namespace gcore
 
 	bool ConsoleCmd_Help::execute( Console & console , const std::vector< LocalizedString >& parameterList )
 	{
-		std::wstringstream helpText;
+		LocalizedStringStream helpText;
 
 		if( parameterList.empty() )
 		{
@@ -29,19 +29,19 @@ namespace gcore
 				const ConsoleCommandPtr command = it->second;
 				GC_ASSERT_NOT_NULL( command.get() );
 
-				printCommandHelp( helpText, console.getCommandCallPrefix(), command );
+				printCommandHelp( helpText, console.commandCallPrefix(), command );
 			}
 
 		}
 		else
 		{
 			// take the first parameter as the command name we want to print the help text of
-			const ConsoleCommandPtr command = console.getCommand( parameterList[0] );
+			const ConsoleCommandPtr command = console.command( parameterList[0] );
 
 			if( command )
 			{
 				// command found!
-				printCommandHelp( helpText, console.getCommandCallPrefix(), command );
+				printCommandHelp( helpText, console.commandCallPrefix(), command );
 			}
 			else
 			{
@@ -56,8 +56,8 @@ namespace gcore
 	}
 
 
-	void ConsoleCmd_Help::printCommandHelp( std::wstringstream& output, const LocalizedString& commandPrefix, const ConsoleCommandPtr& command )
+	void ConsoleCmd_Help::printCommandHelp( LocalizedStringStream& output, const LocalizedString& commandPrefix, const ConsoleCommandPtr& command )
 	{
-		output << commandPrefix << command->getName() << L"\t : \t" << command->help() << std::endl;
+		output << commandPrefix << command->name() << L"\t : \t" << command->help() << L"\n\n";
 	}
 }

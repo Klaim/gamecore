@@ -17,10 +17,10 @@ namespace gcore
 	void PhaseManager::registerPhase( const PhasePtr& phase )
 	{
 		GC_ASSERT( phase.get() != nullptr, "Tried to register a null phase!" );
-		GC_ASSERT( findPhase( phase->getName() ).get() == nullptr, String( "Tried to register an already registered Phase! Phase Name : " ) + phase->getName() );
+		GC_ASSERT( findPhase( phase->name() ).get() == nullptr, String( "Tried to register an already registered Phase! Phase Name : " ) + phase->name() );
 		
 		// register
-		m_phaseIndex[ phase->getName() ] = phase;
+		m_phaseIndex[ phase->name() ] = phase;
 		phase->m_phaseManager = this;
 		
 		// notify
@@ -35,27 +35,27 @@ namespace gcore
 		// notify
 		// phase->onUnregister(); // obsolete
 
-		if( phase->getState() != Phase::UNLOADED )
+		if( phase->state() != Phase::UNLOADED )
 		{
 			// the phase have to be unloaded!
 			// try to unload it now...
 
-			if( phase->getState() == Phase::ACTIVE )
+			if( phase->state() == Phase::ACTIVE )
 			{
 				requestTerminatePhase( phase );
 			}
 
-			if( phase->getState() == Phase::LOADED )
+			if( phase->state() == Phase::LOADED )
 			{
 				requestUnloadPhase( phase );
 			}
 			
-			GC_ASSERT( phase->getState() == Phase::UNLOADED, String( "Tried to unregister phase " ) + phase->getName() + String(" but is not unloaded!") );
+			GC_ASSERT( phase->state() == Phase::UNLOADED, String( "Tried to unregister phase " ) + phase->name() + String(" but is not unloaded!") );
 		}
 
 		// unregister
 		phase->m_phaseManager = nullptr;
-		m_phaseIndex.erase( phase->getName() );
+		m_phaseIndex.erase( phase->name() );
 	}
 
 	void PhaseManager::requestLoadPhase( const PhasePtr& phase )
@@ -68,7 +68,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION << "Tried to request load to a non registered Phase! Name requested : " << phase->getName();
+			GC_EXCEPTION << "Tried to request load to a non registered Phase! Name requested : " << phase->name();
 		}
 
 	}
@@ -83,7 +83,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION << "Tried to request unload to a non registered Phase! Name requested : " << phase->getName();
+			GC_EXCEPTION << "Tried to request unload to a non registered Phase! Name requested : " << phase->name();
 		}
 
 	}
@@ -98,7 +98,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION << "Tried to request activation to a non registered Phase! Name requested : " << phase->getName();
+			GC_EXCEPTION << "Tried to request activation to a non registered Phase! Name requested : " << phase->name();
 		}
 
 	}
@@ -113,7 +113,7 @@ namespace gcore
 		}
 		else
 		{
-			GC_EXCEPTION << "Tried to request termination to a non registered Phase! Name requested : " << phase->getName();
+			GC_EXCEPTION << "Tried to request termination to a non registered Phase! Name requested : " << phase->name();
 		}
 
 	}

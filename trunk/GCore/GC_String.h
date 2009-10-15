@@ -15,7 +15,7 @@ namespace gcore
 	typedef std::basic_string< UTF16_char > LocalizedString;
 
 	/// String type used in gcore.
-	typedef std::string String;
+	typedef std::basic_string< char > String;
 
 }
 

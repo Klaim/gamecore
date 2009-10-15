@@ -27,9 +27,9 @@ namespace gcore	//gcore context
 		@par
 		Using the console :
 		@par
-		If an entry starts with "/" (default command prefix), it suggest that it is a command.
-		The name of the command should be just next "$" : "$ping" for the "ping" command.
-		When adding a new command to the console, the name of the command should not contain "$".
+		If an entry starts with the command prefix, it suggest that it is a command.
+		The name of the command should be just next the command prefix : if "/" is the prefix,"/ping" calls the "ping" command.
+		When adding a new command to the console, the name of the command should not contain the command prefix.
 		Other command prefix can be added or removed.
 		@par
 		If the entry start with a command prefix but no command matches, an error message will be printed.
@@ -49,7 +49,7 @@ namespace gcore	//gcore context
 		typedef std::tr1::unordered_map< LocalizedString , ConsoleCommandPtr > CommandIndex;
 
 
-		// default prefix (L"$"), set on console construction.
+		// default prefix (L"/"), set on console construction.
 		static const LocalizedString DEFAULT_PREFIX;
 		
 		//////////////////////////////////////////////////////////////////////////
@@ -57,10 +57,10 @@ namespace gcore	//gcore context
 
 
 		/** @return Last entries in the console.	*/
-		const EntryList& getLastEntries() const {return m_lastEntries;}
+		const EntryList& lastEntries() const {return m_lastEntries;}
 
 		/** @return Last texts printed.	*/
-		const TextList& getLastTexts() const {return m_lastTexts;}
+		const TextList& lastTexts() const {return m_lastTexts;}
 
 		/** Add one or more translated keys in the current entry.
 			@param keys Translated keys to add in the current entry.
@@ -78,14 +78,14 @@ namespace gcore	//gcore context
 		unsigned long removeEntryKeys( unsigned long keyCount, bool onTheLeft = true );
 
 		/** @return Current position of the cursor in the entry. */
-		unsigned long getCursorPosition() const { return m_cursorPos; }
+		unsigned long cursorPosition() const { return m_cursorPos; }
 
 		/** Set the current position of the cursor in the entry. 
 			@param cursorPos New position of the cursor in the entry.
 			@return True if the cursor have been moved correctly, false if the given position is out of bound.
 				In this case the cursor will be set to the end of the entry.
 		*/
-		bool setCursorPosition( unsigned long cursorPos );
+		bool cursorPosition( unsigned long cursorPos );
 
 		/** Move the cursor in the entry text.
 			
@@ -111,15 +111,15 @@ namespace gcore	//gcore context
 
 		
 		/** Current value of the entry.	*/
-		const LocalizedString& getEntry() const {return m_entry;}
+		const LocalizedString& entry() const {return m_entry;}
 
 		/** Set the current text entry value.
 			@param entry New entry value.
 		*/
-		void setEntry(const LocalizedString& entry);
+		void entry(const LocalizedString& entry_value);
 
 		/** Entry execution.
-			This will store the entry, then if it starts with "$" (by default),
+			This will store the entry, then if it starts with the command prefix,
 			we parse it to get the parameters of the command and we execute the command.
 			Then we reset the entry.
 			If it is not a command, we just use the default command.
@@ -128,9 +128,9 @@ namespace gcore	//gcore context
 		void executeEntry();
 
 		/** Shortcut to execute directly an entry.		*/
-		void execute( const LocalizedString& entry )
+		void execute( const LocalizedString& entryalue )
 		{
-			setEntry( entry );
+			entry( entryalue );
 			executeEntry();
 		}
 
@@ -148,38 +148,38 @@ namespace gcore	//gcore context
 			@param name Name of the ConsoleCommand object to return.
 			@return Return a registered command if found. Return null if not.
 		*/
-		ConsoleCommandPtr getCommand(const LocalizedString& name);
+		ConsoleCommandPtr command(const LocalizedString& name);
 
-		const ConsoleCommandPtr& getActiveCommand() const { return m_activeCommand; }
+		const ConsoleCommandPtr& activeCommand() const { return m_activeCommand; }
 
 		/** Set the default command called when the command is not recognized.
 			@remark The command must have been registered.
 			@param name Name of the registered command to set as default command. 
 				Set "" to set the default neutral behavior of the command (just print the entry).
 		*/
-		void setDefaultCommand(const LocalizedString& name);
+		void defaultCommand(const LocalizedString& name);
 
 		/** Set a prefix used to identify command call.
 			The prefix have to be used at the start of the entry to detect the command call.
 			@param commandCallPrefix Prefix to set to identify command call. Once trimmed, it must not be empty!
 		*/
-		void setCommandCallPrefix(const LocalizedString& commandCallPrefix);
+		void commandCallPrefix(const LocalizedString& commandCallPrefix);
  
 		/** Current prefix used to identify a command call.
 		*/
-		const LocalizedString& getCommandCallPrefix() const { return m_commandCallPrefix; }
+		const LocalizedString& commandCallPrefix() const { return m_commandCallPrefix; }
 		
 		//////////////////////////////////////////////////////////////////////////
 		//Configuration :
 
 		/// @return Maximum of stored entries
-		unsigned int getMaxEntries() const {return m_maxEntries;}
+		unsigned int maxEntries() const {return m_maxEntries;}
 
 		/// @return Maximum of stored printed texts
-		unsigned int getMaxTexts() const {return m_maxTexts;}
+		unsigned int maxTexts() const {return m_maxTexts;}
 
 		/// @return Max entry length
-		unsigned int getMaxEntryLength() const {return m_maxEntryLength;}
+		unsigned int maxEntryLength() const {return m_maxEntryLength;}
 
 		/// @return True if the console will print an executed command.
 		bool willPrintCommandOnExecute() const { return m_printCommandOnExecute; }
@@ -220,7 +220,7 @@ namespace gcore	//gcore context
 		
 		/** Called each time the current entry is modified.
 			@remark User should define rendering processes in this function if necessary.
-			You can get the current entry value with getEntry
+			You can get the current entry value with entry
 		*/
 		virtual void onEntryChanged() { } 
 

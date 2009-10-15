@@ -1,6 +1,6 @@
 #include "GC_ConsoleCmd_PhaseControl.h"
 
-#include <sstream>
+#include "GC_StringStream.h"
 
 #include "GC_Console.h"
 #include "GC_UnicodeAscii.h"
@@ -12,7 +12,7 @@ namespace gcore
 		: ConsoleCommand( name )
 		, m_phase(phase)
 	{
-		
+		GC_ASSERT_NOT_NULL( &m_phase );
 	}
 
 	ConsoleCmd_PhaseControl::~ConsoleCmd_PhaseControl()
@@ -29,14 +29,14 @@ namespace gcore
 		}
 		bool resultOk = false;
 
-		Phase::State phaseState = m_phase.getState();
+		Phase::State phaseState = m_phase.state();
 		const LocalizedString& parameter( parameterList.at(0) );
 
 		if(parameter == L"load")
 		{
 			if(phaseState == Phase::UNLOADED)
 			{
-				console.printText(L"Request loading to phase " + AsciiToUTF16(m_phase.getName()));
+				console.printText(L"Request loading to phase " + AsciiToUTF16(m_phase.name()));
 				m_phase.requestLoad();
 			}
 			else
@@ -49,7 +49,7 @@ namespace gcore
 		{
 			if(phaseState == Phase::LOADED)
 			{
-				console.printText(L"Request activation to phase " + AsciiToUTF16(m_phase.getName()));
+				console.printText(L"Request activation to phase " + AsciiToUTF16(m_phase.name()));
 				m_phase.requestActivate();
 			}
 			else
@@ -62,7 +62,7 @@ namespace gcore
 		{
 			if(phaseState == Phase::ACTIVE)
 			{
-				console.printText(L"Request termination to phase " + AsciiToUTF16(m_phase.getName()));
+				console.printText(L"Request termination to phase " + AsciiToUTF16(m_phase.name()));
 				m_phase.requestTerminate();
 				
 			}
@@ -76,7 +76,7 @@ namespace gcore
 		{
 			if(phaseState == Phase::LOADED)
 			{
-				console.printText(L"Request unload to phase " + AsciiToUTF16(m_phase.getName()));
+				console.printText(L"Request unload to phase " + AsciiToUTF16(m_phase.name()));
 				m_phase.requestUnload();
 			}
 			else
@@ -87,7 +87,7 @@ namespace gcore
 		}
 		else if (parameter == L"state")
 		{
-			console.printText( LocalizedString(L"Phase ") + AsciiToUTF16(m_phase.getName()) +  L" state : "+ toText(phaseState) );
+			console.printText( LocalizedString(L"Phase ") + AsciiToUTF16(m_phase.name()) +  L" state : "+ toText(phaseState) );
 		}
 		else
 		{
@@ -138,7 +138,7 @@ namespace gcore
 
 		default:
 			{
-				std::stringstream errorMsg;
+				StringStream errorMsg;
 				errorMsg << "Unknown Phase::State being translated in text! State value = " ;
 				errorMsg << phaseState;
 				GC_EXCEPTION << errorMsg.str();
@@ -149,16 +149,9 @@ namespace gcore
 
 	LocalizedString ConsoleCmd_PhaseControl::help() const
 	{
-		return	L"help managing a Phase via a Console. \n" \
-				L"It allow the user to link a command to the phase in the console and " \
-				L"use it via it's parameters matching the Phase interface :" \
-				L"\n\n" \
-				L"Parameter | Call \n" \
-				L"----------------------------------------------------------\n" \
-				L"load      | phase.requestLoad();\n" \
-				L"activate  | phase.requestActivate();\n" \
-				L"terminate | phase.requestTerminate();\n" \
-				L"unload    | phase.requestUnload();\n" \
-				L"state     | print the current state of the phase" ;
+		LocalizedStringStream text;
+		text << L"Manipulate the Phase '" << AsciiToUTF16(m_phase.name()) << L"' by using the parameters: load, activate, terminate, unload.";
+				
+		return text.str();
 	}
 }

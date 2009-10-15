@@ -48,7 +48,7 @@ namespace gcore
 		if( m_triggerOnce && m_triggerCount > 0 ) return; // already triggered one time
 
 		// update time passed
-		m_timeSinceLastTrigger += m_clock.getDeltaTime();
+		m_timeSinceLastTrigger += m_clock.deltaTime();
 
 		while( m_timeSinceLastTrigger >= m_waitTime ) // make sure we do more than one trigger if necessary
 		{

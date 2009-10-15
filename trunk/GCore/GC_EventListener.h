@@ -15,15 +15,16 @@ namespace gcore
 		
 		An EventListener object must be registered in an EventManager to receive
 		the Events that the EventManager will receive.
-		On registering, an EventType must be specified. The EventListener will
-		then receive only Events that are of this EventType.
-		It the EventType is equal to 0, the listener will receive all types of event.
+		The EventManager will register the EventListener to catch specific
+		event types.
 		
 		@remark
 		This is a virtual base class : the heritor class must define 
 		the management of the Event received.
+		
 		@remark
-		An EventListener can be registered by more than one EventManager.
+		An EventListener can be registered by more than one EventManager and
+		can listen to more than one type of events.
 
 		@see EventManager, Event
 
@@ -32,48 +33,36 @@ namespace gcore
 	{
 	public:
 
-		/** Constructor.
-			@param eventType Event type to catch once registered in an EventManager. If equal to 0, this EventListener will receive all events from the EventManager.
-		*/
-		EventListener(EventType eventType):eventTypeToCatch(eventType)
-		{}
-
 		/** User defined Event reception.
-			This method will be called when an Event of the same type is
+			This method will be called when an Event of the type of 
 			processed by the EventManager.
-			@param eventToProcess Smart pointer to the Event object.
-			@param eventManager EventManager object that processed the Event.
+			@param e Event that have been sent.
+			@param source EventManager that processed the event.
 		*/
-		virtual void catchEvent(const EventPtr& eventToProcess, EventManager& eventManager) = 0;
+		virtual void catchEvent(const EventPtr& e, EventManager& source) = 0;
 
-		///Event type to catch once registered in an EventManager.
-		const EventType& getEventTypeToCatch() const {return eventTypeToCatch;}
-
+		virtual ~EventListener() {}
+		
 	protected:
 
 	private:
 
-		///Event type to catch once registered in an EventManager.
-		const EventType eventTypeToCatch;
 	};
 
 	/// Function-like object that can catch events.
 	typedef std::tr1::function< void (const EventPtr& , EventManager& ) > EventListenerFunction;
 
-	/** Proxy event listener that only redirect event catches to a provided function-like object.
-		note : seems obsolete ... should be replaced by boost::signal
-	*/
-	class ProxyEventListener : EventListener
+	/** Proxy event listener that only redirect event catches to a provided function-like object.*/
+	class ProxyEventListener : public EventListener
 	{
 	public:
-		ProxyEventListener( const EventListenerFunction& catherFunction, EventType eventType )
-			: EventListener( eventType )
-			, m_catcherFunction( catherFunction )
+		ProxyEventListener( const EventListenerFunction& catherFunction )
+			: m_catcherFunction( catherFunction )
 		{}
 
-		inline void catchEvent(const EventPtr& eventToProcess, EventManager& eventManager)
+		inline void catchEvent(const EventPtr& e, EventManager& source)
 		{
-			m_catcherFunction( eventToProcess, eventManager );
+			m_catcherFunction( e, source );
 		}
 
 	private:

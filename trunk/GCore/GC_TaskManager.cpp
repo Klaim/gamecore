@@ -11,7 +11,7 @@ namespace gcore
 	*/
 	bool TaskManager::TaskCompare_AscendingPriority::operator ()(Task* a1, Task* a2) const 
 	{ 
-		return a1->getPriority() < a2->getPriority(); 
+		return a1->priority() < a2->priority(); 
 	} 
 
 
@@ -33,23 +33,23 @@ namespace gcore
 		//task not already registered
 		if( task->m_state != TS_UNREGISTERED || task->m_taskManager != nullptr )
 		{
-			GC_EXCEPTION << "Tried to register an already registered task! Task : " << task->getName();
+			GC_EXCEPTION << "Tried to register an already registered task! Task : " << task->name();
 		}
 
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) == m_registeredTasksList.end() , "Tried to activate task already registered in this TaskManager! Task : " << task->getName() )
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) == m_registeredTasksList.end() , "Tried to activate task already registered in this TaskManager! Task : " << task->name() )
 
 		//////////////////////////////////////////////////////////////////////////
 
 		//register the task name if not empty
-		if( task->getName() != "" )
+		if( task->name() != "" )
 		{
 			//task name must not be already registered
-			if( m_namedTasksIndex.find( task->getName() ) != m_namedTasksIndex.end() )
+			if( m_namedTasksIndex.find( task->name() ) != m_namedTasksIndex.end() )
 			{
-				GC_EXCEPTION << "Tried to register a task with an already registered name! Task : " << task->getName();
+				GC_EXCEPTION << "Tried to register a task with an already registered name! Task : " << task->name();
 			}
 
-			m_namedTasksIndex[ task->getName() ] = task;
+			m_namedTasksIndex[ task->name() ] = task;
 		}
 
 		// register the task
@@ -68,7 +68,7 @@ namespace gcore
 		// task must be registered here
 		if( task->m_state == TS_UNREGISTERED || task->m_taskManager != this )
 		{
-			GC_EXCEPTION << "Tried to unregister an non registered task! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to unregister an non registered task! Task : " << task->name() ;
 		}
 
 		//////////////////////////////////////////////////////////////////////////
@@ -81,9 +81,9 @@ namespace gcore
 		}
 
 		//remove task name from index if not empty
-		if( task->getName() != "" )
+		if( task->name() != "" )
 		{
-			m_namedTasksIndex.erase( task->getName() );
+			m_namedTasksIndex.erase( task->name() );
 		}
 
 		// now we can unregister the task
@@ -103,16 +103,16 @@ namespace gcore
 		// check : task registered here!
 		if( task->m_taskManager != this )
 		{
-			GC_EXCEPTION << "Tried to activate task not registered in this TaskManager! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to activate task not registered in this TaskManager! Task : " << task->name() ;
 		}
 		
 		// task must be registered but not active nor paused
 		if( task->m_state != TS_REGISTERED )
 		{
-			GC_EXCEPTION << "Tried to activate task already registered or paused! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to activate task already registered or paused! Task : " << task->name() ;
 		}
 
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() )
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() )
 
 		////////////////////////////////////
 
@@ -157,16 +157,16 @@ namespace gcore
 		// task must be registered
 		if( task->m_state == TS_UNREGISTERED )
 		{
-			GC_EXCEPTION << "Tried to terminate a not registered task! Task : "  << task->getName() ;
+			GC_EXCEPTION << "Tried to terminate a not registered task! Task : "  << task->name() ;
 		}
 
 		// task registered here
 		if( task->m_taskManager != this )
 		{
-			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->name() ;
 		}
 		
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() )
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() )
 		/////////////////////////////
 		
 
@@ -187,7 +187,7 @@ namespace gcore
 			}
 		default:
 			{
-				GC_EXCEPTION << "Tried to terminate a nor active nor paused task! Task : " << task->getName();
+				GC_EXCEPTION << "Tried to terminate a nor active nor paused task! Task : " << task->name();
 			}
 		};
 
@@ -207,16 +207,16 @@ namespace gcore
 		// task registered here
 		if( task->m_taskManager != this )
 		{
-			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->name() ;
 		}
 
 		// task registered must be active
 		if( task->m_state != TS_ACTIVE )
 		{
-			GC_EXCEPTION << "Tried to pause a non active task! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to pause a non active task! Task : " << task->name() ;
 		}
 		
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() )
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() )
 		/////////////////////////////
 		// deactivate the task
 		deactivateTask( task );
@@ -240,16 +240,16 @@ namespace gcore
 		// task registered here
 		if( task->m_taskManager != this )
 		{
-			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->getName();
+			GC_EXCEPTION << "Tried to terminate a task not registered in this TaskManager! Task : " << task->name();
 		}
 
 		// task registered in paused list
 		if( task->m_state != TS_PAUSED )
 		{
-			GC_EXCEPTION << "Tried to resume a non paused task! Task : " << task->getName() ;
+			GC_EXCEPTION << "Tried to resume a non paused task! Task : " << task->name() ;
 		}
 
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() );
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() );
 		//////////////////////////////
 		// remove from paused tasks list
 		m_pausedTasksList.remove( task );
@@ -272,7 +272,7 @@ namespace gcore
 		//task not null
 		GC_ASSERT( task != nullptr , "Tried to change the priority of a null task!" );
 		GC_ASSERT( task->m_taskManager == this , "Tried to change the priority of a task not registered in this task manager!" );
-		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() );
+		GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() );
 		// if current priority is the same, don"t change anything
 		if( task->m_priority == newPriority ) return;
 		
@@ -334,8 +334,8 @@ namespace gcore
 
 			if( task != nullptr ) // ignore removed tasks
 			{
-				GC_ASSERT( task->m_state == TS_ACTIVE, String( "Found an non active task in execution list! Task :" ) + task->getName() );
-				GC_ASSERT( task->m_taskManager == this, "Found an active task in execution list that is not managed here! Task :" << task->getName() );
+				GC_ASSERT( task->m_state == TS_ACTIVE, String( "Found an non active task in execution list! Task :" ) + task->name() );
+				GC_ASSERT( task->m_taskManager == this, "Found an active task in execution list that is not managed here! Task :" << task->name() );
 				task->onExecute();
 			}
 
@@ -360,7 +360,7 @@ namespace gcore
 			Task* task = (*itTask);
 
 			GC_ASSERT( task != nullptr , "Found a null task in the task manager!" );
-			GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() )
+			GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() )
 			//change state
 			task->m_state = TS_REGISTERED;
 			//user defined termination
@@ -388,7 +388,7 @@ namespace gcore
 			Task* task = (*it);
 
 			GC_ASSERT( task != nullptr , "Found a null task in the task manager!" );
-			GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->getName() )
+			GC_ASSERT( std::find( m_registeredTasksList.begin(), m_registeredTasksList.end(), task) != m_registeredTasksList.end() , "Tried to activate task not registered in this TaskManager! Task : " << task->name() )
 			task->m_state = TS_UNREGISTERED;
 			task->m_taskManager = nullptr;
 		}

@@ -1,205 +1,152 @@
 #include "GC_EventManager.h"
 
+#include <algorithm>
 
 namespace gcore
 {
 
-
-	/** Constructor. */
 	EventManager::EventManager()
 	{
+		// arbitrary optimizations
+		m_processListeners.reserve( 32 ); 
 		
 	}
 
-	/** Destructor. */
+
 	EventManager::~EventManager()
 	{
-		
+		clear();
 	}
 
-	/** Process an Event object.
-		This will call each EventListener::catchEvent() of EventListener registered that have the same
-		EventType than the Event sent.
-		@param eventToProcess Event to process.
-	*/
-	void EventManager::processEvent(const EventPtr& eventToProcess)
+	void EventManager::addListener( EventListener& eventListener, Event::TypeId typeToCatch )
 	{
-		if(!eventToProcess.get()) GC_EXCEPTION << "Tried to process a null Event.";
+		// get the listeners for this event type or create it
+		EventListenerList& listeners = m_listenerRegister[ typeToCatch ]; 
 
-		typedef std::multimap<EventType, EventListener*  >::iterator I;
-		std::pair<I,I> result=m_eventListenerPool.equal_range(eventToProcess->getType());//Get EventListeners waiting for the same type of Event
-		for(I itc=result.first;itc!=result.second;++itc)
-		{
-			EventListener*  el=itc->second;
-			if(el)el->catchEvent(eventToProcess,(*this));//Catch Event!
-		}
+		// check
+		GC_ASSERT( std::find( listeners.begin(), listeners.end(), &eventListener ) == listeners.end(), "Tried to add the same listener twice for event " << typeToCatch );
 
-		// now send the event to listeners registered to get an event type equal to 0
-		if( eventToProcess->getType() != 0) // we already did it in the upper code?
-		{
-			std::pair<I,I> result=m_eventListenerPool.equal_range(0);//Get EventListeners waiting for the type 0
-			for(I itc=result.first;itc!=result.second;++itc)
-			{
-				EventListener*  el=itc->second;
-				if(el)el->catchEvent(eventToProcess,(*this));//Catch Event!
-			}
-		}
-		
+		// register the listener
+		listeners.push_back( &eventListener );
 
 	}
 
-	/** Register an EventListener.
-		@remark	If the EventListener object is already registered in this
-		EventManager, an Exception will occur.
-		@param eventListener EventListener object to register.
-	*/
-	void EventManager::registerEventListener(EventListener* eventListener)
+	void EventManager::removeListener( EventListener& eventListener )
 	{
-		if(!eventListener) GC_EXCEPTION << "Tried to add a null EventListener.";
-
-		using namespace std;
-
-		typedef multimap< EventType, EventListener* >::iterator I;
-
-		for(I it = m_eventListenerPool.begin() ; it != m_eventListenerPool.end() ; ++it)
+		if( m_listenerRegister.empty() )
 		{
-			EventListener*  e=it->second;
-			if(e==eventListener)
-			{
-				//Tried to add this object twice!
-				GC_EXCEPTION << "Tried to add an EventListener twice!";
-			}
+			GC_ASSERT( !m_listenerRegister.empty(), "Tried to remove a listener from an empty event manager!" );
+			return; 
 		}
 
-		m_eventListenerPool.insert(std::make_pair(eventListener->getEventTypeToCatch(),eventListener));
+		EventListenerRegister::iterator register_it = m_listenerRegister.begin();
 
-		
+		for( ; register_it != m_listenerRegister.end(); ++register_it )
+		{
+			EventListenerList& listeners = register_it->second;
+
+			if( listeners.empty() ) continue; // be lazy;
+
+			listeners.remove( &eventListener );
+		}
+
 	}
 
-	/** Unregister an EventListener.
-		@remark	If the EventListener object is not registered in this
-		EventManager, an Exception will occur.
-		@param eventListener EventListener object to register.
-	*/
-	void EventManager::unregisterEventListener(EventListener* eventListener)
+	void EventManager::removeListener(  Event::TypeId typeToCatch, EventListener& eventListener )
 	{
-		if(!eventListener) GC_EXCEPTION << "Tried to remove a null EventListener!";
-		
-		
-		typedef std::multimap<EventType, EventListener*  >::iterator I;
-		I it;
-		std::pair<I,I> result;
+		EventListenerRegister::iterator it = m_listenerRegister.find( typeToCatch );
 
-		//find the eventListener
-		result=m_eventListenerPool.equal_range(eventListener->getEventTypeToCatch());
-		for(it=result.first;it!=result.second;++it)
+		GC_ASSERT( it != m_listenerRegister.end(), "Tried to remove listener from unregistered event type : " << typeToCatch );
+
+		if( it != m_listenerRegister.end() )
 		{
-			EventListener*  e=it->second;
-			if(e==eventListener)
-			{
-				m_eventListenerPool.erase(it);
-				return;
-			}
+			EventListenerList& listeners = it->second;
+			listeners.remove( &eventListener );
 		}
-		//event catcher not found!!
-		GC_EXCEPTION << "EventListener not found!";
-
 
 	}
 
+	void EventManager::removeAllListeners()
+	{
+		m_listenerRegister.clear();
+	}
 
-	/** Remove all EventListeners registered.
-
-	*/
 	void EventManager::clear()
 	{
-		m_eventListenerPool.clear();
+		removeAllListeners();
 	}
 
-	/** Send an event.
-		@remark The Event will be managed automatically via EventPtr smart pointer. It will
-		then been destroyed once there is no more reference to it.
-		@param eventToSend Event object to send.
-		@param immediate If true, the Event will be processed immediately. If false, the Event is registered and will
-		be processed on the next call of EventManager::processEvents().
-	*/
-	void EventManager::sendEvent( const EventPtr& eventToSend , bool immediate/*=false*/ )
+	void EventManager::send( const EventPtr& e , bool immediate )
 	{
-		if(!eventToSend.get()) GC_EXCEPTION << "Tried to send a null Event!";
+		GC_ASSERT_NOT_NULL( e.get() );
 
-		if(immediate)//Processing of the Event must be done NOW!
+		if( immediate )
 		{
-			processEvent( eventToSend );
-			return;
+			processEvent( e );
+		}
+		else
+		{
+			m_eventQueue.push_back( e );
 		}
 
-		m_eventList.push_back( eventToSend );
 	}
 
-	/** Process all buffered Events.
-		For each Event that have not been sent immediatly, this will call
-		each EventListener::catchEvent() of EventListener registered that have the same
-		EventType than the Event sent.
-	*/
-	void EventManager::processEvents()
+	void EventManager::process()
 	{
-		if(m_eventList.empty()) return;
-		//make a copy of the event list to keep it right while the execution (in cancellation cases)
-		std::list<EventPtr> processEventList(m_eventList);
-		//process each event
-		for(std::list<EventPtr>::iterator it = processEventList.begin(); it!= processEventList.end(); ++it)
+		if( m_eventQueue.empty() ) return; // be lazy!!!
+
+		// first we have to swap the current event queue with the process one (empty)
+		m_processEventQueue.clear();
+		m_processEventQueue.swap( m_eventQueue ); // ready for the next event sent
+
+		// now we have to process each event in the processing queue
+		for( EventQueue::iterator it = m_processEventQueue.begin(); it != m_processEventQueue.end(); ++it )
 		{
-			processEvent( (*it) );
+			const EventPtr e = *it;
+			GC_ASSERT_NOT_NULL( e.get() );
+			processEvent( e );
 		}
 
-		//clear the event list
-		m_eventList.clear();
 	}
 
-	/**	Cancel an Event sent.
-		@param eventToCancel Event to Cancel.
-	*/
-	void EventManager::cancelEvent( const EventPtr& eventToCancel )
-{
-		if(!eventToCancel.get()) GC_EXCEPTION << "Tried to cancel a null Event!";
+	void EventManager::processEvent( const EventPtr& e )
+	{
+		GC_ASSERT_NOT_NULL( e.get() );
 
-		m_eventList.remove( eventToCancel );
+		if( m_listenerRegister.empty() ) return; // no listener registered at all!
+
+		// first dispatch this event to listeners registered to listen to all events
+		EventListenerList& listenAllList = m_listenerRegister[ Event::TypeId() ];
+		dispatchEvent( e, listenAllList );
+
+		// retrieve the event listener list for this event type if it exists
+		EventListenerRegister::iterator register_it = m_listenerRegister.find( e->type() );
+
+		if( register_it == m_listenerRegister.end() ) return; // no listeners for this event!
 		
+		// now dispatch the event to those listeners waiting for it
+		EventListenerList& listeners = register_it->second;
+		dispatchEvent( e, listeners );
+
 	}
 
-	class _Predicate_MatchEventType
+	void EventManager::dispatchEvent( const EventPtr& e, EventListenerList& listeners )
 	{
-	private:
-		EventType type;
-	public:
+		GC_ASSERT_NOT_NULL( e.get() );
 
-		_Predicate_MatchEventType(EventType _type):type(_type){};
+		if( listeners.empty() ) return; // be lazy!!
 
-		bool operator() (const EventPtr& eventPtr)
+		// prepare this dispatch by copying the listener list in the one used to dispatch
+		m_processListeners.reserve( listeners.size() );
+		m_processListeners.assign( listeners.begin(), listeners.end() );
+
+		// ok now we have to send the event to all those catchers
+		for( EventListenerBuffer::iterator it = m_processListeners.begin(); it != m_processListeners.end(); ++it )
 		{
-			if(eventPtr->getType() == type)
-				return true;
+			EventListener* listener = *it;
+			GC_ASSERT_NOT_NULL( listener );
 
-			return false;
+			listener->catchEvent( e, *this ); // catch!
 		}
-
-	};
-
-	/** Cancel all Events of the precised EventType.
-		@remark This will cancel only buffered Events as the others have already been processed.
-		@param eventType Type of Events to cancel.
-	*/
-	void EventManager::cancelEvents(EventType type)
-	{
-		m_eventList.remove_if( _Predicate_MatchEventType(type) );
 	}
-
-	/** Delete all buffered Events not processed.
-	*/
-	void EventManager::cancelAllEvents()
-	{
-		m_eventListenerPool.clear();
-	}
-
-
 }

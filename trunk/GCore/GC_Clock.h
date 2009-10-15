@@ -28,29 +28,33 @@ namespace gcore
 
 		/** @return Virtual seconds passed since the clock initialization.
 		 */
-		const TimeValue& getTime() const{ return m_time; }
+		const TimeValue& time() const{ return m_time; }
+
+		/** Virtual seconds passed since the clock initialization.
+			@param time New value.
+		*/
+		void time(TimeValue );
 
 		/** @return Time flow factor.
 		 */
-		const TimeFlowFactor& getTimeFlowFactor() const {return m_timeFlowFactor;}
-
-		/** Virtual delta time (from the last update and flow factor dependent).
-		*/
-		const TimeValue& getDeltaTime() const { return m_deltaTime;}
-
-		/** @return Maximum virtual time elapsed or 0 or negative value if no limit set (default).                                                                     
-		*/
-		TimeValue getMaxDeltaTime() const { return m_max_deltaTime; }
+		const TimeFlowFactor& timeFlowFactor() const {return m_timeFlowFactor;}
 
 		/** Time flow factor.
 			@param	factor New flow factor value.
-		 */
-		void setTimeFlowFactor(TimeFlowFactor factor){m_timeFlowFactor=factor;}
+		*/
+		void timeFlowFactor(TimeFlowFactor factor){m_timeFlowFactor=factor;}
 
+		/** Virtual delta time (from the last update and flow factor dependent).
+		*/
+		const TimeValue& deltaTime() const { return m_deltaTime;}
+
+		/** @return Maximum virtual time elapsed or 0 or negative value if no limit set (default).                                                                     
+		*/
+		TimeValue maxDeltaTime() const { return m_max_deltaTime; }
 		
 		/** Set a maximum limit to the possible virtual delta time or 0 or negative value for no limit (default).
 		*/
-		void setMaxDeltaTime( TimeValue maxDeltaTime )
+		void maxDeltaTime( TimeValue maxDeltaTime )
 		{
 			GC_ASSERT( maxDeltaTime >= 0, "Max delta time have to be 0 or positive!");
 			m_max_deltaTime = maxDeltaTime;
@@ -58,20 +62,15 @@ namespace gcore
 		
 		/** Reset Time to 0 seconds elapsed.
 		 */
-		void reset(){ m_time=0; }
-
-		/** Virtual seconds passed since the clock initialization.
-			@param time New value.
-		*/
-		void setTime(TimeValue time){m_time=time;}
+		void reset();
 
 		/** @return Clock's name.
 		*/
-		const String& getName() const {return m_name;}
+		const String& name() const {return m_name;}
 
 		/** @copydoc m_clockManager */
-		const ClockManager& getClockManager() const { return m_clockManager; }
-		ClockManager& getClockManager() { return m_clockManager; }
+		const ClockManager& clockManager() const { return m_clockManager; }
+		ClockManager& clockManager() { return m_clockManager; }
 
 	private:
 		///Managed by ClockManager only.
@@ -118,7 +117,7 @@ namespace gcore
 	inline void destroyClock( Clock* clock )
 	{ 
 		GC_ASSERT( clock != nullptr, "Tried to destroy a null clock!" );
-		clock->getClockManager().destroyClock(clock);
+		clock->clockManager().destroyClock(clock);
 	}
 
 	inline void destroyClock( Clock& clock )

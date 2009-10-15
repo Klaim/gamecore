@@ -220,6 +220,14 @@
 			Name="Event"
 			>
 			<File
+				RelativePath=".\GC_DataEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GC_Event.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\GC_Event.h"
 				>
 			</File>
@@ -369,6 +377,10 @@
 			>
 			<File
 				RelativePath=".\GC_String.h"
+				>
+			</File>
+			<File
+				RelativePath=".\GC_StringStream.h"
 				>
 			</File>
 			<File

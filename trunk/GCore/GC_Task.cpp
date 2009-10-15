@@ -57,7 +57,7 @@ namespace gcore
 		m_taskManager->unregisterTask( this );
 	}
 
-	void Task::setPriority( const TaskPriority& priority )
+	void Task::priority( const TaskPriority& priority )
 	{
 		if( m_taskManager != nullptr ) m_taskManager->changeTaskPriority( this, priority );
 		else m_priority = priority;
