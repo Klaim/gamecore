@@ -1,5 +1,7 @@
 #include "GC_Task_EventProcess.h"
 
+#include "GC_EventManager.h"
+
 namespace gcore
 {
 
@@ -18,7 +20,7 @@ namespace gcore
 
 	void Task_EventProcess::execute()
 	{
-		m_eventManager.processEvents();
+		m_eventManager.process();
 	}
 
 }

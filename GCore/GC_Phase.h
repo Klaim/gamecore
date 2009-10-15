@@ -64,10 +64,10 @@ namespace gcore
 		virtual ~Phase(){}
 
 		/// Current state of this phase.
-		const Phase::State& getState() const { return m_state; }
+		const Phase::State& state() const { return m_state; }
 
 		/// Name of this phase.
-		const String& getName() const { return m_name; }
+		const String& name() const { return m_name; }
 
 
 		/** Request this phase to load.
@@ -123,13 +123,13 @@ namespace gcore
 
 		/** Phase manager this phase is currently registered in, or null if not registered yet.
 		*/
-		PhaseManager& getPhaseManager() 
+		PhaseManager& phaseManager() 
 		{ 
 			GC_ASSERT( m_phaseManager != nullptr, "Tried to get the phase manager of a non-managed phase!" ); 
 			return *m_phaseManager;
 		}
 
-		const PhaseManager& getPhaseManager() const
+		const PhaseManager& phaseManager() const
 		{ 
 			GC_ASSERT( m_phaseManager != nullptr, "Tried to get the phase manager of a non-managed phase!" ); 
 			return *m_phaseManager;

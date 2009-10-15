@@ -32,7 +32,7 @@ namespace gcore
 		/** Create a LogManager, when created the m_logList and m_LogCatcherPool are empty.
 			@param defaultLogName Name of the starting default log.
 		**/
-		LogManager( const String& defaultLogName = DEFAULT_LOG );
+		explicit LogManager( const String& defaultLogName = DEFAULT_LOG );
 
 		/** Destructor.
 		**/ 	
@@ -94,6 +94,7 @@ namespace gcore
 		@returns The previous default log.
 		*/
 		Log* setDefaultLog( Log* log );
+
 	
 	private:
 

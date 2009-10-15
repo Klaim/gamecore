@@ -143,19 +143,19 @@ namespace gcore
 
 		/** Return the current active tasks list.
 		*/
-		const TaskList& getActiveTasksList() const { return m_activeTaskList; }
+		const TaskList& activeTasksList() const { return m_activeTaskList; }
 
 		/** Return the current paused tasks list.
 		*/
-		const TaskList& getPausedTaskList() const { return m_pausedTasksList; }
+		const TaskList& pausedTaskList() const { return m_pausedTasksList; }
 
 		/** Return the current registered tasks list.
 		*/
-		const TaskList& getRegisteredTasksList() const { return m_registeredTasksList; }
+		const TaskList& registeredTasksList() const { return m_registeredTasksList; }
 
 		/** Return the named index of all named tasks registered.
 		*/
-		const TaskIndex& getNamedTasksIndex() const {return m_namedTasksIndex;}
+		const TaskIndex& namedTasksIndex() const {return m_namedTasksIndex;}
 
 	private:
 

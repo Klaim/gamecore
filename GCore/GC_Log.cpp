@@ -12,7 +12,7 @@ namespace gcore
 		: m_logManager(logManager)
 		, m_name(name)
 	{
-		const String filepath = logManager.getRootDirectory() + "/" + name;
+		const String filepath = name;
 		if(isNewFile)
 		{
 			m_fileStream.open(filepath.c_str(), std::ios_base::trunc);
@@ -80,15 +80,13 @@ namespace gcore
 		using namespace boost::gregorian;
 		ptime now = second_clock::local_time(); //use the clock
 
-		std::stringstream finalMsgStream;
+		StringStream finalMsgStream;
 		finalMsgStream << "[" << to_simple_string( now.time_of_day() ) << "] " << message;
 		const String& finalMsg = finalMsgStream.str();
 
 		//display in console if any:
 		std::cerr << "[" << m_name << "]" << finalMsg << std::endl; 
-		std::cerr.flush();
 		std::cout << "[" << m_name << "]" << finalMsg << std::endl; 
-		std::cout.flush();
 
 		//write in file :
 		m_fileStream << finalMsg << std::endl;

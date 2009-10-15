@@ -11,7 +11,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-#include <sstream>
+#include "GC_StringStream.h"
 #include "GC_Common.h"
 #include "GC_String.h"
 
@@ -74,7 +74,7 @@ namespace gcore
 		friend class LogManager;
 
 		/// Current message being written.
-		std::stringstream m_message;
+		StringStream m_message;
 
 		/// The stream writing into the file.
 		std::ofstream	m_fileStream;

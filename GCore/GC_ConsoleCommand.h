@@ -41,8 +41,8 @@ namespace gcore
 
 		virtual ~ConsoleCommand(){}
 
-		const LocalizedString& getName() const { return m_name; }
-		const LocalizedString& getParamSeparator() const { return m_paramSeparator; }
+		const LocalizedString& name() const { return m_name; }
+		const LocalizedString& paramSeparator() const { return m_paramSeparator; }
 
 		/**	User defined command execution.
 		@param console Console object that execute this command.
@@ -52,7 +52,7 @@ namespace gcore
 		the following entries to the console will directly be sent to this command. 
 		Return false to terminate immediately.
 		*/
-		virtual bool execute( Console& console , const std::vector< LocalizedString >& parameterList)=0;
+		virtual bool execute( Console& console , const std::vector< LocalizedString >& parameterList) = 0;
 	
 		/** User defined help text. @see ConsoleCmd_Help */
 		virtual LocalizedString help() const = 0;

@@ -54,4 +54,13 @@ namespace gcore
 
 	}
 
+	void Clock::reset()
+	{
+		m_time=0;
+	}
+
+	void Clock::time( TimeValue time )
+	{
+		m_time=time;
+	}
 }

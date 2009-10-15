@@ -34,7 +34,7 @@ namespace gcore
 
 	void ChronicTask::onTimerTrigger( Timer& timer )
 	{
-		if( getState() == TS_ACTIVE )
+		if( state() == TS_ACTIVE )
 		{
 			m_timerTriggered = true;
 		}

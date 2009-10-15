@@ -1,4 +1,4 @@
-#include <sstream>
+#include "GC_StringStream.h"
 #include "GC_ConsoleCmd_TaskControl.h"
 #include "GC_Task.h"
 #include "GC_Console.h"
@@ -30,7 +30,7 @@ namespace gcore
 		}
 		bool resultOk = false;
 
-		TaskState taskState = m_task.getState();
+		TaskState taskState = m_task.state();
 		const LocalizedString& parameter( parameterList.at(0) );
 
 		if(parameter == L"start")
@@ -38,7 +38,7 @@ namespace gcore
 			if(taskState == TS_REGISTERED)
 			{
 				m_task.activate();
-				console.printText(L"Started task " + AsciiToUTF16(m_task.getName()));
+				console.printText(L"Started task " + AsciiToUTF16(m_task.name()));
 			}
 			else
 			{
@@ -51,7 +51,7 @@ namespace gcore
 			if(taskState == TS_ACTIVE)
 			{
 				m_task.pause();
-				console.printText(L"Paused task " + AsciiToUTF16(m_task.getName()));
+				console.printText(L"Paused task " + AsciiToUTF16(m_task.name()));
 			}
 			else
 			{
@@ -64,7 +64,7 @@ namespace gcore
 			if(taskState == TS_PAUSED)
 			{
 				m_task.resume();
-				console.printText(L"Resumed task " + AsciiToUTF16(m_task.getName()));
+				console.printText(L"Resumed task " + AsciiToUTF16(m_task.name()));
 			}
 			else
 			{
@@ -77,7 +77,7 @@ namespace gcore
 			if(taskState != TS_REGISTERED)
 			{
 				m_task.terminate();
-				console.printText(L"Stopped task " + AsciiToUTF16(m_task.getName()));
+				console.printText(L"Stopped task " + AsciiToUTF16(m_task.name()));
 			}
 			else
 			{
@@ -87,7 +87,7 @@ namespace gcore
 		}
 		else if (parameter == L"state")
 		{
-			console.printText( LocalizedString(L"Task ") + AsciiToUTF16(m_task.getName()) +  L" state : "+ toText(taskState) );
+			console.printText( LocalizedString(L"Task ") + AsciiToUTF16(m_task.name()) +  L" state : "+ toText(taskState) );
 		}
 		else
 		{
@@ -127,7 +127,7 @@ namespace gcore
 
 		default:
 			{
-				std::stringstream errorMsg;
+				StringStream errorMsg;
 				errorMsg << "Unknown TaskState being translated in text! State value = " ;
 				errorMsg << taskState;
 				GC_EXCEPTION <<  errorMsg.str();

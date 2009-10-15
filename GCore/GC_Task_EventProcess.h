@@ -4,11 +4,11 @@
 
 #include "GC_Common.h"
 
-#include "GC_EventManager.h"
 #include "GC_Task.h"
 
 namespace gcore
 {
+	class EventManager;
 
 	/** Task that update an EventManager by calling it's EventManager::processEvents() function each cycle.
 

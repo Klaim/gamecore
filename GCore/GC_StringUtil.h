@@ -4,6 +4,7 @@
 
 #include "GC_Common.h"
 #include "GC_String.h"
+#include "GC_StringStream.h"
 
 namespace gcore
 {
@@ -16,7 +17,7 @@ namespace gcore
 	template< typename NumType >
 	inline String numToString( const NumType& number )
 	{
-		std::stringstream converterStream;
+		StringStream converterStream;
 		converterStream << number;
 		return converterStream.str();
 	}
@@ -26,7 +27,7 @@ namespace gcore
 	template< typename NumType >
 	inline LocalizedString numToUTFString( const NumType& number )
 	{
-		std::wstringstream converterStream;
+		LocalizedStringStream converterStream;
 		converterStream << number;
 		return converterStream.str();
 	}

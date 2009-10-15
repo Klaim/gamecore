@@ -6,6 +6,26 @@ namespace gcore
 	
 	const String LogManager::DEFAULT_LOG( "lastSession.log" );
 
+	LogManager::LogManager(const String& defaultLogName)
+		: m_defaultLog( nullptr )
+	{
+		m_defaultLog = createLog( defaultLogName, true );
+		m_defaultLog->logMessage("LogManager initialized.");
+
+	}
+
+	LogManager::~LogManager()
+	{
+		m_defaultLog->logMessage("Terminate LogManager.");
+		// Destroy all logs
+		LogIndex::iterator it;
+		for (it = m_logList.begin(); it != m_logList.end(); ++it)
+		{
+			GC_ASSERT( it->second != nullptr, "Found a null log in log manager!" );
+			delete it->second;
+		}
+	}
+
 	void LogManager::addLogListener( LogListener* logListener, const String& logName )
 	{
 		GC_ASSERT( logListener != nullptr, String( "Tried to add a null listener to log " ) + logName );
@@ -150,25 +170,5 @@ namespace gcore
 		return oldlog;
 	}
 
-	LogManager::LogManager(const String& defaultLogName)
-	{
-		//We create a system logIt that is set as the default logIt : 
-
-		m_defaultLog = createLog( defaultLogName, true );
-
-		m_defaultLog->logMessage("LogManager initialized.");
-
-	}
-
-	LogManager::~LogManager()
-	{
-		m_defaultLog->logMessage("Terminate LogManager.");
-		// Destroy all logs
-		LogIndex::iterator it;
-		for (it = m_logList.begin(); it != m_logList.end(); ++it)
-		{
-			GC_ASSERT( it->second != nullptr, "Found a null log in log manager!" );
-			delete it->second;
-		}
-	}
+	
 }

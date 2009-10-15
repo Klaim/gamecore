@@ -2,21 +2,18 @@
 #define GCORE_EVENT_H
 #pragma once
 
-//#include <memory>
 #include <memory>
+#include <string>
 
 #include "GC_Common.h"
 
 namespace gcore
 {
 
-	///Event type type .
-	typedef int EventType;
-
 	/** Event object base class.
 		
 		An Event is sent in an EventManager that will reroute
-		it to it's registered EventListeners that have the same EventType.
+		it to it's registered EventListeners that listen to the same TypeId.
 		@par
 		This class alone is enough to manage simple events. In the case
 		of an event that should provide data, you should use this class as
@@ -27,21 +24,18 @@ namespace gcore
 		@see EventManager
 
 	*/
-	class GCORE_API Event
+	class Event
 	{
-	private:
-
-	protected:
-
-		///Event type value. It is not constant to make the Event class serializable if necessary.
-		EventType m_Type;
-
 	public:
 
+		///Event type id.
+		typedef std::string TypeId;
+
 		/** Constructor.
-			@param Type id of this event.
+			@param type Type of this event.
 		*/
-		Event(EventType type):m_Type(type)
+		Event( TypeId type )
+			:m_type(type)
 		{}
 		
 		virtual ~Event(){}
@@ -49,13 +43,20 @@ namespace gcore
 		/** Event type id value.
 			@return Type id of this event.
 		*/
-		const EventType& getType() const {return m_Type;}
+		TypeId type() const {return m_type;}
+	
+	private:
+
+		///Event type value. It is not constant to make the Event class serializable if necessary.
+		const TypeId m_type;
+
 	};
 
-	/** Smart pointer for Event objects.
-	*/
-	//typedef  std::tr1::shared_ptr<Event> EventPtr;
+	/** Smart pointer for Event objects. */
 	typedef  std::tr1::shared_ptr<Event> EventPtr;
+
+	/** Utility function to create a simple event with it's pointer "on the fly" with the default basic allocator.*/
+	EventPtr GCORE_API makeEvent( Event::TypeId type );
 
 }
 
